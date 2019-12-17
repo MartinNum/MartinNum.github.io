@@ -6,15 +6,23 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Hexo</title>
+  <title>JVM学习笔记（第二章） | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;index.html">
+  <meta name="description" content="第二章Java虚拟机的多线程通过线程轮流切换并分配处理器执行时间的方式实现 程序计数器如果执行的是Java方法，计数器记录的是正在执行的虚拟机字节码指令的地址，字节码解释器通过改变计数器的值来选取下一条需要执行的字节码指令，分支、循环、跳转、异常处理、线程恢复等基本功能都需要依赖这个计数器来完成。 线程私有各个线程之间计数器互不影响，独立存储。 OutOfMemoryError：无，唯一Java虚">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JVM学习笔记（第二章）">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;12&#x2F;17&#x2F;JVM%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E7%AC%AC%E4%BA%8C%E7%AB%A0%EF%BC%89&#x2F;index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="第二章Java虚拟机的多线程通过线程轮流切换并分配处理器执行时间的方式实现 程序计数器如果执行的是Java方法，计数器记录的是正在执行的虚拟机字节码指令的地址，字节码解释器通过改变计数器的值来选取下一条需要执行的字节码指令，分支、循环、跳转、异常处理、线程恢复等基本功能都需要依赖这个计数器来完成。 线程私有各个线程之间计数器互不影响，独立存储。 OutOfMemoryError：无，唯一Java虚">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="https:&#x2F;&#x2F;i.loli.net&#x2F;2019&#x2F;12&#x2F;17&#x2F;Qoe4VWywYjL6hrO.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;i.loli.net&#x2F;2019&#x2F;12&#x2F;17&#x2F;KV5uBo7rL1xm2Js.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;i.loli.net&#x2F;2019&#x2F;12&#x2F;17&#x2F;gdGn1KqTZShEJX8.png">
+<meta property="article:published_time" content="2019-12-17T02:14:52.000Z">
+<meta property="article:modified_time" content="2019-12-17T02:15:16.249Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;i.loli.net&#x2F;2019&#x2F;12&#x2F;17&#x2F;Qoe4VWywYjL6hrO.png">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -150,139 +158,14 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-    <article id="post-JVM学习笔记（第三章）" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+            <article id="post-JVM学习笔记（第二章）" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/12/17/JVM%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E7%AC%AC%E4%B8%89%E7%AB%A0%EF%BC%89/">JVM学习笔记（第三章）</a>
-    </h1>
-  
-
-        
-        <a href="/2019/12/17/JVM%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E7%AC%AC%E4%B8%89%E7%AB%A0%EF%BC%89/" class="archive-article-date">
-  	<time datetime="2019-12-17T02:15:45.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-12-17</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="第三章"><a href="#第三章" class="headerlink" title="第三章"></a>第三章</h1><h3 id="对象死活"><a href="#对象死活" class="headerlink" title="对象死活"></a>对象死活</h3><h6 id="引用计数算法"><a href="#引用计数算法" class="headerlink" title="引用计数算法"></a>引用计数算法</h6><p>原理：给对象添加一个引用计数器，当有地方引用它时，计数器值就加1；当引用失效时，计数器值减1；任何时刻计数器值为0就表示该对象不可能在被使用。</p>
-<p>优点：实现简单，判断效率高。</p>
-<p>缺点：无法解决对象之间相互引用的问题。</p>
-<h6 id="可达性分析算法"><a href="#可达性分析算法" class="headerlink" title="可达性分析算法"></a>可达性分析算法</h6><p>原理：通过一系列称为“GC Roots”的对象作为起始点，从这些节点开始向下搜索，搜索所走过的路径称为引用链(Reference Chain)，当一个对象到GC Roots没有任何引用链相连时，则证明此对象是不可用的。</p>
-<p>可作为GC Roots的对象：1、虚拟机栈（栈帧中的本地变量表）中引用的对象。</p>
-<p>​                                         2、方法区中类静态属性引用的对象。</p>
-<p>​                                         3、方法区中常量引用的对象。</p>
-<p>​                                         4、本地方法栈中JNI（即一般说的Native方法）引用的对象。</p>
-<h6 id="引用类别"><a href="#引用类别" class="headerlink" title="引用类别"></a>引用类别</h6><p>强引用：类似”Object obj = new Object()”，只要强引用在存在，垃圾收集永远不会回收被引用的对象。</p>
-<p>软引用：用来描述一些有用但并非必需的对象。软引用关联着的对象在系统即将发生内存溢出异常之前会被列进回收范围之中进行第二次回收                                         </p>
-<p>如果这次回收还没有足够的内存，才会抛出内存溢出异常。JDK1.2之后，提供了SoftReference类来实现软引用。</p>
-<p>弱引用：用来描述非必需对象，比软引用更弱，被弱引用关联的对象只能生存到下一次垃圾收集发生之前。JDK1.2之后，提供了WeakReference类来实现弱引用。</p>
-<p>虚引用：也称为幽灵引用或者幻影引用。一个对象是否有虚引用的存在，完全不会对其生存时间构成影响，也无法通过虚引用来取得一个对象实例。为一个对象设置虚引用的唯一目的就是能在这个对象被收集器回收时收到一个系统通知。JDK1.2之后，提供PhantomReference类来实现虚引用。</p>
-<h6 id="生存还是死亡"><a href="#生存还是死亡" class="headerlink" title="生存还是死亡"></a>生存还是死亡</h6><p>在可达性分析算法中不可达的对象（第一次标记），并非”非死不可“。当对象覆盖了finalize()方法并且对象的finalize()方法没有被执行过，则对象将被放置在一个F-Queue的队列中，并在稍后由一个虚拟机自动建立的，低优先级的Finalizer线程去执行它，finalize()方法是对象逃脱死亡的最后一次机会，稍后GC将对F-Queue中的对象进行第二次标记，如果对像在finalize()方法中拯救自己——只要重新与引用链上的任何一个对象建立关联即可，譬如把自己（this关键字）赋值给某个类变量或者对象的成员变量，那么在第二次标记时它将被移除出“即将回收”的集合；如果对象这个时候还没有逃脱，那基本上久真的要被回收了。（对象没有覆盖finalize()方法或者对象的finalize()方法已经被执行过了，则直接回收）</p>
-<h6 id="回收方法区"><a href="#回收方法区" class="headerlink" title="回收方法区"></a>回收方法区</h6><p>方法区的回收分为废弃常量和无用的类。</p>
-<p>废弃常量：废弃常量的回收和Java堆中对象的回收非常类似。假如一个字符串“abc“已经进入了常量池中，当系统中没有任何一个String对象引用常量池中的”abc“常量，也没有其他地方引用这个字面量，如果发生内存回收，这个”abc“常量在必要的情况下就会被系统清理出常量池。常量池中的其他类（接口）、方法、字段的符号引用也与此类似。</p>
-<p>无用的类：（1）该类所有的实例都已经被回收，也就是Java堆中不存在该类的任何实例。（2）加载该类的ClassLoader已经被回收。（3）该类对应的java.lang.Class对象没有在任何地方被引用，无法在任何地方通过放射访问该类的方法。</p>
-<h3 id="垃圾收集算法"><a href="#垃圾收集算法" class="headerlink" title="垃圾收集算法"></a>垃圾收集算法</h3><h6 id="标记-清除"><a href="#标记-清除" class="headerlink" title="标记-清除"></a>标记-清除</h6><p>分为”标记“和”清除“两个阶段：首先标记需要回收的对象，然后在标记完成后清除被标记的对象。</p>
-<img src="https://i.loli.net/2019/12/17/JdyGEmvDWjepqAR.png" alt="标记-清除.png" title="标记-清除.png" />
-
-<p>缺点:（1）标记和清除两个过程的效率都不高。（2）标记清除之后会产生大量不连续的内存碎片，在分配大对象的情况下，可能会因为没有足够大的连续内存空间而导致分配失败，从而导致提前出发一次垃圾收集动作。</p>
-<h6 id="复制算法"><a href="#复制算法" class="headerlink" title="复制算法"></a>复制算法</h6><p>将内存分为大小向相同的两块，每次只使用其中一块。当这一块内存用完了，就对其进行垃圾回收，然后将存活下来的对象复制到另一块保留的内存中，最后将之前使用过的内存快一次清理掉。但是每次一半的空间作为保留区域导致内存的空间利用率非常低，在IBM公司的研究中，新生代中的对象98%是“朝生夕死”，所以不必按照1：1的比例来划分内存空间，而是将内存空间划分为一块较大的Eden空间和两块较小的Survivor空间，每次使用Eden和其中一块Survivor。当回收时，将Eden和Survivor中还存活的对象一次性复制到另一块Survivor空间上，最后清理掉Eden和刚才使用过的Survivor空间。这样就只有10%的保留空间会被浪费掉。</p>
-<p>分配担保：如果另一块Survivor空间没有足够的空间存放上一次新生代收集下来的存活对象时，这些对象将直接通过分配担保机制直接进入老年代。</p>
-<img src="https://i.loli.net/2019/12/17/QNSTfAVbniHgX9r.png" alt="复制算法.png" title="复制算法.png" />
-
-<p>优点：实现简单，运行高效。</p>
-<p>缺点：部分保留空间会被浪费掉。</p>
-<h6 id="标记-整理算法"><a href="#标记-整理算法" class="headerlink" title="标记-整理算法"></a>标记-整理算法</h6><p>由于老年代对象存活率很高，如果使用复制算法，则会进行大量的复制操作，效率会降低。所以根据老年代的特点，提出了标记-整理算法，首先标记出可回收的对象，然后将所有存活的对象都向一端移动，最后直接清理掉端边界以外的内存。</p>
-<img src="https://i.loli.net/2019/12/17/T5mvryhD4sogqeC.png" alt="标记-整理.png" title="标记-整理.png" />
-
-<h6 id="分代收集算法"><a href="#分代收集算法" class="headerlink" title="分代收集算法"></a>分代收集算法</h6><p>根据不同代的特点选择适合的收集算法。在新生代中，每次垃圾收集都会有大批的对象死去，只有少量存活，所以选择复制算法。老年代中对象的存活率高，没有额外空间对它进行分配担保，就必须使用“标记——清除”或者“标记——整理”算法。</p>
-<h6 id="枚举根节点"><a href="#枚举根节点" class="headerlink" title="枚举根节点"></a>枚举根节点</h6><p>在GC是需要Stop The World, 在进行可达性分析的时候不可能逐个检查在全局性引用（例如常量或类静属性）与执行上下文（例如栈帧中的本地变量表），因为很多应用仅仅方法区就有数百兆，如果逐个检车会消耗很多时间。在HotSpot实现中，在类加载的时候把对象内什么偏移量上是什么类型的数据计算出来并在特定的位置使用一组称为OopMap的数据结构来存储栈和寄存器中哪些位置是引用。</p>
-<h6 id="安全点（Safepoint）"><a href="#安全点（Safepoint）" class="headerlink" title="安全点（Safepoint）"></a>安全点（Safepoint）</h6><p>由于可能导致引用关系变化，或者说OopMap内容变化的指令非常多，不可能为每天这样的指令生成对应的OopMap，这样GC的空间成本会变的非常高。所以HotSpot只在安全点生成OopMap，安全点需要满足的条件是“是否具有让程序长时间执行的特征”。“长时间执行”的最明显特征就是指令序列复用，例如方法调用、循环跳转、异常跳转等</p>
-<h6 id="中断方式"><a href="#中断方式" class="headerlink" title="中断方式"></a>中断方式</h6><p>在GC发生时，如何让所有线程都跑到安全点再停顿下来，分为抢先式中断和主动式中断。</p>
-<p>抢先式中断：在GC发生时，首先把所有线程都中断，如果发现有线程没有在安全点上，就恢复该线程，让它跑到安全点上在中断。</p>
-<p>主动式中断：在安全点上设置一个标志，各个线程执行时主动去轮询这个标志，当发现中断标志为真时就自己中断挂起。</p>
-<h6 id="安全区域（Safe-Region）"><a href="#安全区域（Safe-Region）" class="headerlink" title="安全区域（Safe Region）"></a>安全区域（Safe Region）</h6><p>安全区域是指在一段代码片段中，引用关系不会发生变化。在这个区域的任意地方开始GC都是安全的。线程在执行到Safe Region中的代码时，首相标记自己已经进入了Safe Region,当JVM要发起GC时，就不用管标识自己为Safe Region状态的线程。当线程要离开Safe Region时，需要检查系统是否已经完成GC，如果完成，那线程继续执行，否则就必须等待直到收到可以安全离开Safe Region的信号为止。</p>
-<h3 id="垃圾收集器"><a href="#垃圾收集器" class="headerlink" title="垃圾收集器"></a>垃圾收集器</h3><img src="https://i.loli.net/2019/12/17/S7ZWKkn9H6zDuUq.png" alt="垃圾收集器.png" title="垃圾收集器.png" />
-
-<h6 id="Serial收集器"><a href="#Serial收集器" class="headerlink" title="Serial收集器"></a>Serial收集器</h6><p>工作时只会使用一个CPU或一条收集线程去完成垃圾收集工作，并且它工作时必须暂停其他所有的工作线程（Stop The World），直到它收集结束。</p>
-<img src="https://i.loli.net/2019/12/17/t5ruxV7UCf4kYjX.jpg" alt="Serial.png" title="Serial.png" />
-
-<p>优点：简单高效</p>
-<h6 id="ParNew"><a href="#ParNew" class="headerlink" title="ParNew"></a>ParNew</h6><p>是Serial收集器的多线程版，除了使用多条线程进行垃圾收集以外，其余的和Serial收集器完全一样</p>
-<h6 id="Parallel-Scavenge"><a href="#Parallel-Scavenge" class="headerlink" title="Parallel Scavenge"></a>Parallel Scavenge</h6><p>使用复制算法，并行多线程收集器，垃圾收集时需要Stop The World。与ParNew不用在于，Parallel Scavenge可以控制吞吐量。吞吐量=运行用户代码时间/（运行用户代码时间+垃圾收集时间），Parallel Scavenge提供两个参数分别控制最大垃圾收集停顿时间和直接设置吞吐量大小。这里需要注意的一点是，并不是最大的垃圾收集停顿时间设置的越小越好，GC停顿时间缩短是以牺牲吞吐量和新生代空间来换取的，因为新生代的空间越小，垃圾收集的速度越快，但是这回导致新生代垃圾收集越发频繁，从而降低吞吐量。</p>
-<h6 id="serial-old"><a href="#serial-old" class="headerlink" title="serial old"></a>serial old</h6><p>老年代单线程收集器，使用“标记-整理”算法。收集器在Client模式下使用。如果在Server模式下，有两大用途:（1）在JDK1.5以及之前的版本中与Parallel Scavenge收集器搭配使用。（2）作为CMS的后备预案，在并发收集发生Concurrent Mode Failure时使用。</p>
-<h6 id="Parallel-Old"><a href="#Parallel-Old" class="headerlink" title="Parallel Old"></a>Parallel Old</h6><p>是Parallel Scavenge的老年代版本。使用多线程和“标记-整理”算法。在注重吞吐量以及CPU资源敏感的场合，都可以优先考虑Parallel Scavenge加Parallel Old收集器。</p>
-<h6 id="CMS"><a href="#CMS" class="headerlink" title="CMS"></a>CMS</h6><p>以最短回收回收停顿时间为目标的收集器，采用“标记-清除”算法。收集过程分为4个步骤，（1）初始标记。&lt;Stop The World&gt;（2）并发标记。（3）重新标记。&lt;Stop The World&gt;（4）并发清除。</p>
-<p>（1）初始标记&lt;Stop The World&gt;：仅仅标记一下GC Roots能直接关联到的对象，速度很快。</p>
-<p>（2）并发标记：进行GC Roots Tracing的过程，和用户线程一起进行。</p>
-<p>（3）重新标记&lt;Stop The World&gt;：修正并发标记阶段，因为用户程序继续运作而导致标记产生变动的那一部分对象的标记记录。</p>
-<p>（4）并发清除：清理掉死亡的对象，和用户线程一起进行。</p>
-<p>缺点：</p>
-<p>（1）虽然并发阶段不会导致用户线程停顿，但是会因为占用一部分线程而导致应用程序变慢，总吞吐量会降低。但CPU数量越少，对应用程序的影响越大。</p>
-<p>（2）CMS无法处理浮动垃圾，浮动垃圾是指CMS并发清除阶段用户线程产生的新的垃圾，这部分垃圾出现在标记之后，所以只能留到下次GC时在清理。由于浮动垃圾的产生，所以在并发收集阶段，需要预留一部分空间给程序运作使用。要是CMS运行期间预留的内存无法满足程序需要，就会导致“Concurrent Mode Failure”失败，这时虚拟机就会启动Serial Old收集器来重新进行老年代的垃圾收集，这样停顿的时间就会很长了。</p>
-<p>（3）CMS采用的“标记-清除”算法会在收集结束时产生大量的空间碎片。往往会由于老年代没有足够大的连续空间，而导致对大对象的分配失败，最终导致提前促发一次Full GC。为了解决这一问题，CMS收集器提供了两个参数，一个参数用于控制是否在Full GC时开启内存碎片合并整理，另一个参数用于设置执行多少次不压缩的Full GC后，跟一次带压缩的Full GC。</p>
-<h6 id="G1"><a href="#G1" class="headerlink" title="G1"></a>G1</h6><p>收集过程分为四个步骤，（1）初始标记。&lt;Stop The World&gt;（2）并发标记。（3）最终标记。&lt;Stop The World&gt;（4）筛选回收&lt;Stop The World&gt;</p>
-<p>（1）初始标记&lt;Stop The World&gt;：标记GC Roots能直接关联到的对象。</p>
-<p>（2）并发标记：从GC Roots开始对堆中对象进行可达性分析，找出存活对象，与用户线程并发执行。</p>
-<p>（3）最终标记&lt;Stop The World&gt;：为了修正在并发标记阶段因为用户程序继续运作而导致标记产生变动的那一部分标记。</p>
-<p>（4）筛选回收&lt;Stop The World&gt;：首先对各个Region的回收价值和成本进行排序，根据用户所期望的GC停顿时间来制定回收计划（回收哪些回收价值最高的Region）。</p>
-<h3 id="内存分配与回收策略"><a href="#内存分配与回收策略" class="headerlink" title="内存分配与回收策略"></a>内存分配与回收策略</h3>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/12/17/JVM%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E7%AC%AC%E4%B8%89%E7%AB%A0%EF%BC%89/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-JVM学习笔记（第二章）" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/12/17/JVM%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E7%AC%AC%E4%BA%8C%E7%AB%A0%EF%BC%89/">JVM学习笔记（第二章）</a>
+    <h1 class="article-title" itemprop="name">
+      JVM学习笔记（第二章）
     </h1>
   
 
@@ -351,16 +234,84 @@
       
 
       
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/12/17/JVM%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E7%AC%AC%E4%BA%8C%E7%AB%A0%EF%BC%89/">展开全文 >></a>
-        </p>
-      
 
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
+        </div>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/12/17/JVM%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E7%AC%AC%E4%BA%8C%E7%AB%A0%EF%BC%89/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
       
       <div class="clearfix"></div>
     </div>
   </div>
 </article>
+
+  
+<nav id="article-nav">
+  
+    <a href="/2019/12/17/JVM%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E7%AC%AC%E4%B8%89%E7%AB%A0%EF%BC%89/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          JVM学习笔记（第三章）
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/12/16/HNSW%E5%8E%9F%E7%90%86/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">HNSW原理</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
 
 <aside class="wrap-side-operation">
     <div class="mod-side-operation">
@@ -380,105 +331,14 @@
 
 
 
-
   
-    <article id="post-HNSW原理" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/12/16/HNSW%E5%8E%9F%E7%90%86/">HNSW原理</a>
-    </h1>
   
 
-        
-        <a href="/2019/12/16/HNSW%E5%8E%9F%E7%90%86/" class="archive-article-date">
-  	<time datetime="2019-12-16T09:46:25.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-12-16</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="HNSW原理"><a href="#HNSW原理" class="headerlink" title="HNSW原理"></a>HNSW原理</h1><h3 id="一、NSW原理"><a href="#一、NSW原理" class="headerlink" title="一、NSW原理"></a>一、NSW原理</h3><p>​        HNSW近邻搜索算法是在NSW近邻搜索算法的基础上改进而来，实际上NSW可以说的HNSW的组成部分。所以在介绍HNSW之前，我先介绍NSW算法原理，在理解了NSW原理之后，也就理解了百分之八十的HNSW原理。下面我们开始NSW的学习之旅。    </p>
-<p>​        在理想状态下，一个优秀的近邻搜索算法应该包含三点，一、构图算法的时间复杂度低。二、查找目标点的查找效率高。三、具备“高沙公路“机制（相距较远的点之间的连线，用于快速接近目标节点）。</p>
-<h6 id=""><a href="#" class="headerlink" title=""></a><img src="https://i.loli.net/2019/12/16/kezlnC9Hiw3ROPr.png" alt="highway.png" title="highway.png" /></h6><p>​        上图为NSW算法的结构图（随意画的），假设有一个二维的平面，我们现在把图中的二维数据向量随机的逐个插入到平面直角坐标系中，他们的位置关系如上图所示。为了让读者更好的理解“高速公路机制”，我来解释一下上图的原理。黑色的线连接的两个点，表示这两个点是近邻关系。红色的线就是“高速公路”机制。假设我要查找的是图中的绿点query的近邻点，并且查找的出发点为图中的a节点（随机出发点），我们计算节点a的所有友节点距离节点query的距离，并得到节点b是a节点所有友节点中距离查找点query最近的点，于是就跳转到节点b，并以节点b为下一个出发点继续查找，发生在节点a上的过程一模一样的发生在节点b上，于是我们就找到了节点c，在遍历节点c的有节点时，我们发现节点c的所有友节点距离节点query的距离都没有比节点c本身距离节点query的距离更近，于是节点c就是我们要找的距离query最近的点。</p>
-<p>​        通过上面的例子我们可以明显的感觉到“高速公路”机制在查找中起到的重要作用，通过“高速公路”我们可以快速的到达目标节点附近，大大的减少了节点之间的跳转，很大的提升了查找的效率。</p>
-<p>​        接下来我来谈一谈“高速公路”机制形成的过程。在构图算法够造节点之间结构的时候，点是随机插入的，这就表明在早期的图构建的时候，出现“高速公路”的概率会非常的大，假如我们要构建的图由一百万个节点组成，节点的友节点数量设置为4。在插入第10个节点的时候，我只能在前9个节点中选出4个距离最近的友节点，我选择的余地很小，只有9个节点可供选择，所以选出来的4个友节点基本上并不是真正意义上的距离当前节点最近的友节点，这时候“高速公路”就出现了。那么在什么时候更加容易出现呢？这个问题的答案很明显，只有在构建图早期选择余地小的时候更容易出现高速公路。举个极端的例子，当我在插入第一百万个节点时，图结构已经被训练了999999，所以在当前图中查找到的友节点一定是当前图中真正意义上的近邻。</p>
-<h6 id="（2）NSW中逐渐被取代的“高速公路”"><a href="#（2）NSW中逐渐被取代的“高速公路”" class="headerlink" title="（2）NSW中逐渐被取代的“高速公路”"></a>（2）NSW中逐渐被取代的“高速公路”</h6><p>​        上一节中，我们讲到了“高速公路”机制为NSW近邻搜索所带来的好处。本节标题为什么说NSW中的“高速公路”会被逐渐取代呢。为了解释NSW中的“高速公路”为什么会被逐渐取代，接下来我们来聊一聊NSW近邻图构建过程中的细节。                       </p>
-<img src="https://i.loli.net/2019/12/16/CHAFXsW8bDEi5o9.png" alt="insert.png" title="insert.png" />
-
-<p>​         上图为NSW算法的结构图（认真画的），假设有一个二维的平面，我们现在把图中的二维数据向量按照a、b、c、d、e、f的顺序随机逐个插入到平面直角坐标系中，并且节点的友节点数量设置为4。</p>
-<p>第一步：当a节点插入图中时只有它自己，所以没有友节点可以选择，a-&gt;0。</p>
-<p>第二步：当b节点插入图中时，只有a节点供选择（不管距离是不是接近），于是只能将b节点的友节点指向a，并且a节点也更新自己的友节点，因为a节点的友节点数量为0，没有超过4，所以更新a节点的友节点指向b，这样就在a节点和b节点之间添加了双向的箭头，a-&gt;b、b-&gt;a。</p>
-<p>第三步：当c节点插入图中时，只有a节点和b节点课供选择，所以b节点的友节点只能指向a节点和b节点，并且更新a节点和b节点的友节点，因为a节点和b节点当前的友节点数量还是1，所以直接加入c节点为友节点，a-73-&gt;b-90-&gt;c、b-73-&gt;a-88-&gt;c、c-88-&gt;b-90-&gt;a。</p>
-<p>第四步：当d节点插入图中时，只有a节点、b节点和c节点可供选择，所以d节点的友节点只能指向a节点、b节点和c节点，并且更新a节点、b节点和c节点的友节点，因为a节点、b节点和c节点当前的友节点数量还是2，所以直接加入d节点为友节点，a-73-&gt;b-90-&gt;c-120-&gt;d、b-73-&gt;a-85-&gt;d-88-&gt;c、c-39-&gt;d-88-&gt;b-90-&gt;a、d-39-&gt;c-85-&gt;b-120-&gt;a。</p>
-<p>第五步：当e节点插入图中时，只有a节点、b节点、c节点和d节点可供选择，所以d节点的友节点只能指向a节点、b节点、c节点和d节点，并且更新a节点、b节点、c节点和d节点的友节点，因为a节点、b节点、c节点和d节点当前的友节点数量还是3，所以直接加入e节点为友节点，a-48-&gt;e-73-&gt;b-90-&gt;c-120-&gt;d、b-73-&gt;a-85-&gt;d-88-&gt;c-99-&gt;e、c-39-&gt;d-59-&gt;e-88-&gt;b-90-&gt;a、d-39-&gt;c-85-&gt;b-101-&gt;e-120-&gt;a、e-48-&gt;a-59-&gt;c-99-&gt;b-101-&gt;d。</p>
-<p>第六步：这一步是关键的一步，也是解释为什么“高速公路”会被短边所取代的一步。注意三点，一、目前结构中的所有节点的友节点数量都为4。二、4个友节点是所有节点友节点数量的上限。三、每个节点之间都是双向箭头连接。当f节点插入图中时，有a节点、b节点、c节点、d节点和e节点5个节点可供选择。因为友节点的上限为4个，所以f节点只能选中这5个节点中离自己最近的四个节点作为自己的友节点即a节点、b节点、c节点和d节点。当插入f节点后，相应的更新a节点、b节点、c节点和d节点的友节点。a-48-&gt;e-73-&gt;b-90-&gt;c-120-&gt;d、b<strong>-52-&gt;f</strong>-73-&gt;a-85-&gt;d-88-&gt;c<del>-99-&gt;e</del>、c-39-&gt;d-59-&gt;e<strong>-87-&gt;f</strong>-88-&gt;b<del>-90-&gt;a</del>、d-39-&gt;c<strong>-56-&gt;f</strong>-85-&gt;b-101-&gt;e<del>-120-&gt;a</del>、e-48-&gt;a-59-&gt;c-99-&gt;b-101-&gt;d、f-52-&gt;b-56-&gt;d-87-&gt;c-121-&gt;a</p>
-<p>​        更新a: f节点和a节点之间的距离为121，大于a节点友节点中距离a节点最远的节点d（120），所以a节点不需要更新友节点。a-48-&gt;e-73-&gt;b-90-&gt;c-120-&gt;d</p>
-<p>​        更新b： f节点和b节点之间的距离为52，小于b节点友节点中距离b节点最远的节点e（99），所以b节点剔除当前最远的友节点e，并加入新的节点f。b<strong>-52-&gt;f</strong>-73-&gt;a-85-&gt;d-88-&gt;c<del>-99-&gt;e</del></p>
-<p>​        更新c： f节点和c节点之间的距离为87，小于c节点友节点中距离c节点最远的节点a（90），所以c节点剔除当前最远的友节点a，并加入新的节点f。c-39-&gt;d-59-&gt;e<strong>-87-&gt;f</strong>-88-&gt;b<del>-90-&gt;a</del></p>
-<p>​        更新d： f节点和d节点之间的距离为56，小于d节点友节点中距离d节点最远的节点a（120），所以d节点剔除当前最远的友节点a，并加入新的节点f。d-39-&gt;c<strong>-56-&gt;f</strong>-85-&gt;b-101-&gt;e<del>-120-&gt;a</del></p>
-<p>​        通过上面六个点的插入，不难发现，节点的友节点在新的节点插入的过程中会不断的被更新，节点友节点中的长边“高速公路”会不断的随着新的节点的插入被短边所取代，所以就有了本节标题中所说的“逐渐被取代的“高速公路””。</p>
-<p>​        以上内容就是NSW算的全部内容。</p>
-<h6 id="（3）HNSW算法原理"><a href="#（3）HNSW算法原理" class="headerlink" title="（3）HNSW算法原理"></a>（3）HNSW算法原理</h6><p>​        接下来开始我们的正文——HNSW算法的介绍，通过上面的讲解，其实我已经讲解了HNSW80%的内容。上一节中我讲到NSW图结构中的“高速公路”会随着点的插入逐渐被短边所取代，所以在图结构最终构建完成后，图结构中的“高速公路”（长边）将会所剩无几，那么“高速公路”在查找过程中所带来的优势也会变得微乎其微。</p>
-<p>​        那么怎么样让NSW中的“高速公路”保持一定的数量呢？那就是将NSW和跳表结合起来，所以我们先来看看跳表的原理。</p>
-<img src="https://i.loli.net/2019/12/16/Jw5n68WFMPKctV7.png" alt="jumpTable.png" title="jumpTable.png" />
-
-<p>​        如上图所示，原始链表为有序链表，原始链表中的每个节点都有50%的概率添加到一级索引层，而一级索引层的节点同样也有50%的概率添加到二级索引层。当我现在要查找图中绿色节点32时，我可以分两种方法查找。方法一：在原始链表中查找，那么需要跳转11次才能到达绿色节点。方法二：先在二级索引中查找，经过两次跳转到达30节点，然后从下一级的30节点开始查找，最后再到原始链表查找，那么算上层之间的跳 转，只需要跳转6次便可到达绿色节点。</p>
-<p>​        跳表通过将节点随机的分层，保证了上层结构为“高速公路”，底层为精细查找，通过上层“高速公路”快速接近目标查找点，那么HNSW就是NSW和跳表的结合体。</p>
-<p>​        如下示意图图所示，读者应该可以明显的感觉的跳表和NSW的结合给搜索带来的优势。</p>
-<img src="https://i.loli.net/2019/12/16/DvZA7QgMJ5N4USh.png" alt="hnsw.png" title="hnsw.png" />
-
-<p>​        以上内容就是对HNSW原理的个人总结。有不准确或不到位的地方希望读者指出。如果想要进一步了解HNSW的代码实现，请到我的github上下载源码，代码来自于<a href="https://github.com/kakao/n2.git，我只是对里面的参数和关键代码添加了注解，希望可以帮助读者更加轻松的理解代码意思，下载地址为：https://github.com/MartinNum/HNSW_explain.git。下面附上内存模型图，图中的参数对应代码中的参数，读者可以结合内存模型图理解代码。" target="_blank" rel="noopener">https://github.com/kakao/n2.git，我只是对里面的参数和关键代码添加了注解，希望可以帮助读者更加轻松的理解代码意思，下载地址为：https://github.com/MartinNum/HNSW_explain.git。下面附上内存模型图，图中的参数对应代码中的参数，读者可以结合内存模型图理解代码。</a></p>
-<img src="https://i.loli.net/2019/12/16/Y8BFC3HUhlEDckb.png" alt="HNSW_memory_model.png" title="HNSW_memory_model.png" />
-
-
-
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/12/16/HNSW%E5%8E%9F%E7%90%86/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
+  
 
   
+
   
 
 
@@ -501,8 +361,8 @@
     <script>
 	var yiliaConfig = {
 		mathjax: false,
-		isHome: true,
-		isPost: false,
+		isHome: false,
+		isPost: true,
 		isArchive: false,
 		isTag: false,
 		isCategory: false,

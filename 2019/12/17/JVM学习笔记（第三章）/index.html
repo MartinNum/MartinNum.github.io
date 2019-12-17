@@ -6,15 +6,25 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Hexo</title>
+  <title>JVM学习笔记（第三章） | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;index.html">
+  <meta name="description" content="第三章对象死活引用计数算法原理：给对象添加一个引用计数器，当有地方引用它时，计数器值就加1；当引用失效时，计数器值减1；任何时刻计数器值为0就表示该对象不可能在被使用。 优点：实现简单，判断效率高。 缺点：无法解决对象之间相互引用的问题。 可达性分析算法原理：通过一系列称为“GC Roots”的对象作为起始点，从这些节点开始向下搜索，搜索所走过的路径称为引用链(Reference Chain)，当">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JVM学习笔记（第三章）">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;12&#x2F;17&#x2F;JVM%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E7%AC%AC%E4%B8%89%E7%AB%A0%EF%BC%89&#x2F;index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="第三章对象死活引用计数算法原理：给对象添加一个引用计数器，当有地方引用它时，计数器值就加1；当引用失效时，计数器值减1；任何时刻计数器值为0就表示该对象不可能在被使用。 优点：实现简单，判断效率高。 缺点：无法解决对象之间相互引用的问题。 可达性分析算法原理：通过一系列称为“GC Roots”的对象作为起始点，从这些节点开始向下搜索，搜索所走过的路径称为引用链(Reference Chain)，当">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="https:&#x2F;&#x2F;i.loli.net&#x2F;2019&#x2F;12&#x2F;17&#x2F;JdyGEmvDWjepqAR.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;i.loli.net&#x2F;2019&#x2F;12&#x2F;17&#x2F;QNSTfAVbniHgX9r.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;i.loli.net&#x2F;2019&#x2F;12&#x2F;17&#x2F;T5mvryhD4sogqeC.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;i.loli.net&#x2F;2019&#x2F;12&#x2F;17&#x2F;S7ZWKkn9H6zDuUq.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;i.loli.net&#x2F;2019&#x2F;12&#x2F;17&#x2F;t5ruxV7UCf4kYjX.jpg">
+<meta property="article:published_time" content="2019-12-17T02:15:45.000Z">
+<meta property="article:modified_time" content="2019-12-17T02:19:06.220Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;i.loli.net&#x2F;2019&#x2F;12&#x2F;17&#x2F;JdyGEmvDWjepqAR.png">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -150,16 +160,14 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-    <article id="post-JVM学习笔记（第三章）" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+            <article id="post-JVM学习笔记（第三章）" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/12/17/JVM%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E7%AC%AC%E4%B8%89%E7%AB%A0%EF%BC%89/">JVM学习笔记（第三章）</a>
+    <h1 class="article-title" itemprop="name">
+      JVM学习笔记（第三章）
     </h1>
   
 
@@ -244,16 +252,75 @@
       
 
       
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/12/17/JVM%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E7%AC%AC%E4%B8%89%E7%AB%A0%EF%BC%89/">展开全文 >></a>
-        </p>
-      
 
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
+        </div>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/12/17/JVM%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E7%AC%AC%E4%B8%89%E7%AB%A0%EF%BC%89/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
       
       <div class="clearfix"></div>
     </div>
   </div>
 </article>
+
+  
+<nav id="article-nav">
+  
+  
+    <a href="/2019/12/17/JVM%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E7%AC%AC%E4%BA%8C%E7%AB%A0%EF%BC%89/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">JVM学习笔记（第二章）</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
 
 <aside class="wrap-side-operation">
     <div class="mod-side-operation">
@@ -273,212 +340,14 @@
 
 
 
-
   
-    <article id="post-JVM学习笔记（第二章）" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/12/17/JVM%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E7%AC%AC%E4%BA%8C%E7%AB%A0%EF%BC%89/">JVM学习笔记（第二章）</a>
-    </h1>
   
 
-        
-        <a href="/2019/12/17/JVM%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E7%AC%AC%E4%BA%8C%E7%AB%A0%EF%BC%89/" class="archive-article-date">
-  	<time datetime="2019-12-17T02:14:52.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-12-17</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="第二章"><a href="#第二章" class="headerlink" title="第二章"></a>第二章</h1><h3 id="Java虚拟机的多线程"><a href="#Java虚拟机的多线程" class="headerlink" title="Java虚拟机的多线程"></a>Java虚拟机的多线程</h3><p>通过线程轮流切换并分配处理器执行时间的方式实现</p>
-<h3 id="程序计数器"><a href="#程序计数器" class="headerlink" title="程序计数器"></a>程序计数器</h3><p>如果执行的是Java方法，计数器记录的是正在执行的虚拟机字节码指令的地址，字节码解释器通过改变计数器的值来选取下一条需要执行的字节码指令，分支、循环、跳转、异常处理、线程恢复等基本功能都需要依赖这个计数器来完成。</p>
-<h6 id="线程私有"><a href="#线程私有" class="headerlink" title="线程私有"></a>线程私有</h6><p>各个线程之间计数器互不影响，独立存储。</p>
-<h6 id="OutOfMemoryError：无，唯一"><a href="#OutOfMemoryError：无，唯一" class="headerlink" title="OutOfMemoryError：无，唯一"></a>OutOfMemoryError：无，唯一</h6><h3 id="Java虚拟机栈"><a href="#Java虚拟机栈" class="headerlink" title="Java虚拟机栈"></a>Java虚拟机栈</h3><p>生命周期和线程相同，描述的是Java方法执行的内存模型：每个方法在执行的同时都会创建一个栈帧用于存储局部表量表、操作数栈、动态链接、方法出口等信息。</p>
-<h6 id="线程私有-1"><a href="#线程私有-1" class="headerlink" title="线程私有"></a>线程私有</h6><h6 id="局部变量表"><a href="#局部变量表" class="headerlink" title="局部变量表"></a>局部变量表</h6><p>存放编译期克制的各种基本数据类型（boolean、byte、char、short、int、float、long&lt;2&gt;、double&lt;2&gt;）、对象引用（可能是一个指向对象起始地址的引用指针，也可能是指向一个代表对象的句柄或其他与此对象相关的位置）、returnAdress类型（指向一条字节码指令的地址）</p>
-<h6 id="StackOverflowError"><a href="#StackOverflowError" class="headerlink" title="StackOverflowError"></a>StackOverflowError</h6><p>当去线程请求的栈深度大于虚拟机所允许的深度。</p>
-<h6 id="OutOfMemoryError"><a href="#OutOfMemoryError" class="headerlink" title="OutOfMemoryError"></a>OutOfMemoryError</h6><p>如果虚拟机可以动态扩展。当扩展时无法申请到足够的内存。</p>
-<h3 id="本地方法栈"><a href="#本地方法栈" class="headerlink" title="本地方法栈"></a>本地方法栈</h3><p>与虚拟机栈的作用非常相似，不同在于虚拟机栈为Java服务，本地方法栈为Native方法服务。</p>
-<h3 id="Java堆"><a href="#Java堆" class="headerlink" title="Java堆"></a>Java堆</h3><p>在虚拟机启动时创建，所有对象实例以及数组都要在堆上分配（但随着JIT编译器和逃逸分析技术的成熟，所有对象都要在分配在堆上变得不那么绝对），是垃圾收集器管理的主要区域</p>
-<h6 id="线程共享"><a href="#线程共享" class="headerlink" title="线程共享"></a>线程共享</h6><h6 id="OUtOfMemoryError"><a href="#OUtOfMemoryError" class="headerlink" title="OUtOfMemoryError"></a>OUtOfMemoryError</h6><p>当堆中没有内存完成实例分配，并且堆也无法再扩展时。</p>
-<h3 id="方法区"><a href="#方法区" class="headerlink" title="方法区"></a>方法区</h3><p>用于存储已被虚拟机加载的类信息、常量、静态变量、即时编译器编译后的代码等数据。</p>
-<p>注意点：HotSpt虚拟机把GC分代收集扩展至方法区，即是用永久代来实现方法区，对于其他的虚拟机来说不存在永久代的概念。</p>
-<p>特点：除了和Java堆一样不需要连续的内存空间和可以选择固定大小或可扩展外，还可以选择不实现垃圾收集。相对而言，垃圾收集行为在这个区域比较少出现，这区域的内存回收目标只要是针对常量池的回收和对类型的卸载，但是垃圾收集的效果不好，尤其是类型卸载。</p>
-<h6 id="OutOfMemoryError-1"><a href="#OutOfMemoryError-1" class="headerlink" title="OutOfMemoryError"></a>OutOfMemoryError</h6><p>当方法区无法满足内存分配需求时。</p>
-<h6 id="线程共享-1"><a href="#线程共享-1" class="headerlink" title="线程共享"></a>线程共享</h6><h3 id="运行时常量池"><a href="#运行时常量池" class="headerlink" title="运行时常量池"></a>运行时常量池</h3><p>是方法区的一部分，用于存放Class文件中的常量池在编译期生成的各种字面量和符号引用。</p>
-<p>特点：运行时常量池具有动态性，并不是预置入Class文件中常量池的内容才能进入方法区的运行时常量池，运行期间也可能将新的常量放入池中，比如String类的intern()方法。</p>
-<p>注意点：JDK1.7之前，String的intern()方法会把首次遇到的字符串实例复制到永久代中（方法区称为永久代，方法区的运行时常量池），返回的也是永久代中这个字符串实例的引用，如果不是该字符串不是首次出现，则直接返回已存在字符串实例的引用。JDK1.7之后，String的intern()方法不会在复制首次遇到的实例，而是在常量池中记录首次出现的实例引用，如果不是该字符串不是首次出现，则直接返回已存在字符串实例的引用。</p>
-<h6 id="OUtOfMemoryError-1"><a href="#OUtOfMemoryError-1" class="headerlink" title="OUtOfMemoryError"></a>OUtOfMemoryError</h6><p>当常量池无法再申请到内存时。</p>
-<h3 id="直接内存"><a href="#直接内存" class="headerlink" title="直接内存"></a>直接内存</h3><p>使用Native函数库直接分配堆外内存，然后通过存储在Java堆中的DirectByteBuffer对象作为这块内存的引用进行操作。</p>
-<p>注意点：直接内存更适合在内存申请次数较少，但读写操作较频繁的场景。</p>
-<h6 id="OutOfMemoryError-2"><a href="#OutOfMemoryError-2" class="headerlink" title="OutOfMemoryError"></a>OutOfMemoryError</h6><h3 id="对象的创建"><a href="#对象的创建" class="headerlink" title="对象的创建"></a>对象的创建</h3><p>(1) 首先检查new指令的参数能否在常量池中定位到一个类的符号引用。</p>
-<p>(2) 检查这个符号引用代表的类是否已被加载、解析和初始化过。如果没有，那必须先执行相应的类加载过程。</p>
-<p>(3) 虚拟机为新生的对象分配内存，对象所需的内存大小在类加载完成后便可完全确定。</p>
-<p>(4) 内存分配完成后，虚拟机会把分配到的内存空间都初始化为零值（不包括对象头），保证了对象实例字段在Java代码中可以不赋初值就可以直接使用。</p>
-<p>(5) 虚拟机要对对象进行必要的设置，例如这个对象是哪个类的实例、如何才能找到类的元数据信息、对象的哈希码、对象的GC分代年龄等信息。这些信息存放在对象的对象头中。</p>
-<p>(6) 执行&lt;init&gt;方法，把对象按照程序员的意愿进行初始化。</p>
-<h6 id="堆内存分配规则"><a href="#堆内存分配规则" class="headerlink" title="堆内存分配规则"></a>堆内存分配规则</h6><p>指针碰撞–假设java堆中的内存是绝对规整的，所有用过的内存放在一边，空闲的内存放在另一边，使用指针作为分界点的指示器。那么在分配内存时，只需要指针向空闲空间的方向移动对象大小相等的距离即可。</p>
-<p>空闲列表–如果java堆的内存并不是规整的，虚拟机需要维护一个列表，记录上哪些内存块是可用的，在分配内存时从列表中找到一块足够大的空间划分给对象实例，并更新列表上的记录。</p>
-<h6 id="并发"><a href="#并发" class="headerlink" title="并发"></a>并发</h6><p>(1) 对分配内存空间的动作进行同步处理——实际上虚拟机采用CAS配上失败重试的方式保证更新操作的原子性。</p>
-<p>(2) 把内存分配的动作按照线程划分在不同的空间之中进行，即每个线程在Java堆中预先分配一小块内存，称为本地线程分配缓冲（Thread Local Allocation Buffer，TLAB）。那个线程要分配内存，就在哪个线程的TLAB上分配，只有TLAB用完并分配新的TLAB是，才需要同步锁定。</p>
-<h3 id="对象的内存布局"><a href="#对象的内存布局" class="headerlink" title="对象的内存布局"></a>对象的内存布局</h3><h6 id="对象头"><a href="#对象头" class="headerlink" title="对象头"></a>对象头</h6><p>第一部分：用于存储对象自身的运行时数据，如哈希码（HashCode）、GC分代年龄、锁状态标记、线程持有的锁、偏向线程ID、偏向时间戳等，这部分数据的长度在32位和64位的虚拟机上中分别为32bit和64bit，官方称它为“Mark Word”。Mark Word是非固定的数据结构，它会根据自己的状态复用自己的存储空间。</p>
-<img src="https://i.loli.net/2019/12/17/Qoe4VWywYjL6hrO.png" alt="对象头.png" title="对象头.png" />
-
-<p>第二部分：类型指针，即对象指向它的类元数据的指针，虚拟机通过这个指针来确定这个对象是哪个类的实例。另外，如果对象是一个Java数组，那在对象头中还必须包括一块用于记录数组长度的数据，因为虚拟机可以通过普通Java对象的元数据信息确定Java对象的大小，但是无法通过数组的元数据确定数组的大小。</p>
-<p>注意：并不是所有的虚拟机实现都必须在对象数据上保留类型指针，换句话说，查找对象的元数据信息并不一定要经过对象本身。&lt;2.3.3&gt;</p>
-<h6 id="实例数据"><a href="#实例数据" class="headerlink" title="实例数据"></a>实例数据</h6><p>存储程序代码中所定义的各种类型的字段内容。无论是从父类继承下来的，还是在子类中定义的，都会被记录起来。</p>
-<h6 id="对齐填充"><a href="#对齐填充" class="headerlink" title="对齐填充"></a>对齐填充</h6><p>对齐填充并不是必然存在的，也没有特变的含义，仅仅起到占位符的作用。由于HotSpot VM的自动内存管理系统要求对象的起始地址必须是8个字节的倍数，所以对象所占的内存如果不是8个字节的倍数，就需要通过对齐填充来补全。</p>
-<h3 id="对象的访问定位"><a href="#对象的访问定位" class="headerlink" title="对象的访问定位"></a>对象的访问定位</h3><h6 id="使用句柄"><a href="#使用句柄" class="headerlink" title="使用句柄"></a>使用句柄</h6><p>在Java堆中划分出一块内存作为句柄池，reference中的存储的就是对象的句柄地址，而句柄中包含了对象实例数据与类型数据各自的具体地址信息。</p>
-<img src="https://i.loli.net/2019/12/17/KV5uBo7rL1xm2Js.png" alt="句柄访问.png" title="句柄访问.png" />
-
-<p>优势：reference中存储的是稳定的句柄地址，在对象被移动时只会改变句柄总的实例数据指针。</p>
-<h6 id="直接指针访问"><a href="#直接指针访问" class="headerlink" title="直接指针访问"></a>直接指针访问</h6><p>reference中存储对象的地址</p>
-<img src="https://i.loli.net/2019/12/17/gdGn1KqTZShEJX8.png" alt="直接指针访问.png" title="直接指针访问.png" />
-
-<p>优势：速度更快，节省了一次指针定位的时间开销。·</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/12/17/JVM%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E7%AC%AC%E4%BA%8C%E7%AB%A0%EF%BC%89/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-HNSW原理" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/12/16/HNSW%E5%8E%9F%E7%90%86/">HNSW原理</a>
-    </h1>
   
 
-        
-        <a href="/2019/12/16/HNSW%E5%8E%9F%E7%90%86/" class="archive-article-date">
-  	<time datetime="2019-12-16T09:46:25.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-12-16</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="HNSW原理"><a href="#HNSW原理" class="headerlink" title="HNSW原理"></a>HNSW原理</h1><h3 id="一、NSW原理"><a href="#一、NSW原理" class="headerlink" title="一、NSW原理"></a>一、NSW原理</h3><p>​        HNSW近邻搜索算法是在NSW近邻搜索算法的基础上改进而来，实际上NSW可以说的HNSW的组成部分。所以在介绍HNSW之前，我先介绍NSW算法原理，在理解了NSW原理之后，也就理解了百分之八十的HNSW原理。下面我们开始NSW的学习之旅。    </p>
-<p>​        在理想状态下，一个优秀的近邻搜索算法应该包含三点，一、构图算法的时间复杂度低。二、查找目标点的查找效率高。三、具备“高沙公路“机制（相距较远的点之间的连线，用于快速接近目标节点）。</p>
-<h6 id=""><a href="#" class="headerlink" title=""></a><img src="https://i.loli.net/2019/12/16/kezlnC9Hiw3ROPr.png" alt="highway.png" title="highway.png" /></h6><p>​        上图为NSW算法的结构图（随意画的），假设有一个二维的平面，我们现在把图中的二维数据向量随机的逐个插入到平面直角坐标系中，他们的位置关系如上图所示。为了让读者更好的理解“高速公路机制”，我来解释一下上图的原理。黑色的线连接的两个点，表示这两个点是近邻关系。红色的线就是“高速公路”机制。假设我要查找的是图中的绿点query的近邻点，并且查找的出发点为图中的a节点（随机出发点），我们计算节点a的所有友节点距离节点query的距离，并得到节点b是a节点所有友节点中距离查找点query最近的点，于是就跳转到节点b，并以节点b为下一个出发点继续查找，发生在节点a上的过程一模一样的发生在节点b上，于是我们就找到了节点c，在遍历节点c的有节点时，我们发现节点c的所有友节点距离节点query的距离都没有比节点c本身距离节点query的距离更近，于是节点c就是我们要找的距离query最近的点。</p>
-<p>​        通过上面的例子我们可以明显的感觉到“高速公路”机制在查找中起到的重要作用，通过“高速公路”我们可以快速的到达目标节点附近，大大的减少了节点之间的跳转，很大的提升了查找的效率。</p>
-<p>​        接下来我来谈一谈“高速公路”机制形成的过程。在构图算法够造节点之间结构的时候，点是随机插入的，这就表明在早期的图构建的时候，出现“高速公路”的概率会非常的大，假如我们要构建的图由一百万个节点组成，节点的友节点数量设置为4。在插入第10个节点的时候，我只能在前9个节点中选出4个距离最近的友节点，我选择的余地很小，只有9个节点可供选择，所以选出来的4个友节点基本上并不是真正意义上的距离当前节点最近的友节点，这时候“高速公路”就出现了。那么在什么时候更加容易出现呢？这个问题的答案很明显，只有在构建图早期选择余地小的时候更容易出现高速公路。举个极端的例子，当我在插入第一百万个节点时，图结构已经被训练了999999，所以在当前图中查找到的友节点一定是当前图中真正意义上的近邻。</p>
-<h6 id="（2）NSW中逐渐被取代的“高速公路”"><a href="#（2）NSW中逐渐被取代的“高速公路”" class="headerlink" title="（2）NSW中逐渐被取代的“高速公路”"></a>（2）NSW中逐渐被取代的“高速公路”</h6><p>​        上一节中，我们讲到了“高速公路”机制为NSW近邻搜索所带来的好处。本节标题为什么说NSW中的“高速公路”会被逐渐取代呢。为了解释NSW中的“高速公路”为什么会被逐渐取代，接下来我们来聊一聊NSW近邻图构建过程中的细节。                       </p>
-<img src="https://i.loli.net/2019/12/16/CHAFXsW8bDEi5o9.png" alt="insert.png" title="insert.png" />
-
-<p>​         上图为NSW算法的结构图（认真画的），假设有一个二维的平面，我们现在把图中的二维数据向量按照a、b、c、d、e、f的顺序随机逐个插入到平面直角坐标系中，并且节点的友节点数量设置为4。</p>
-<p>第一步：当a节点插入图中时只有它自己，所以没有友节点可以选择，a-&gt;0。</p>
-<p>第二步：当b节点插入图中时，只有a节点供选择（不管距离是不是接近），于是只能将b节点的友节点指向a，并且a节点也更新自己的友节点，因为a节点的友节点数量为0，没有超过4，所以更新a节点的友节点指向b，这样就在a节点和b节点之间添加了双向的箭头，a-&gt;b、b-&gt;a。</p>
-<p>第三步：当c节点插入图中时，只有a节点和b节点课供选择，所以b节点的友节点只能指向a节点和b节点，并且更新a节点和b节点的友节点，因为a节点和b节点当前的友节点数量还是1，所以直接加入c节点为友节点，a-73-&gt;b-90-&gt;c、b-73-&gt;a-88-&gt;c、c-88-&gt;b-90-&gt;a。</p>
-<p>第四步：当d节点插入图中时，只有a节点、b节点和c节点可供选择，所以d节点的友节点只能指向a节点、b节点和c节点，并且更新a节点、b节点和c节点的友节点，因为a节点、b节点和c节点当前的友节点数量还是2，所以直接加入d节点为友节点，a-73-&gt;b-90-&gt;c-120-&gt;d、b-73-&gt;a-85-&gt;d-88-&gt;c、c-39-&gt;d-88-&gt;b-90-&gt;a、d-39-&gt;c-85-&gt;b-120-&gt;a。</p>
-<p>第五步：当e节点插入图中时，只有a节点、b节点、c节点和d节点可供选择，所以d节点的友节点只能指向a节点、b节点、c节点和d节点，并且更新a节点、b节点、c节点和d节点的友节点，因为a节点、b节点、c节点和d节点当前的友节点数量还是3，所以直接加入e节点为友节点，a-48-&gt;e-73-&gt;b-90-&gt;c-120-&gt;d、b-73-&gt;a-85-&gt;d-88-&gt;c-99-&gt;e、c-39-&gt;d-59-&gt;e-88-&gt;b-90-&gt;a、d-39-&gt;c-85-&gt;b-101-&gt;e-120-&gt;a、e-48-&gt;a-59-&gt;c-99-&gt;b-101-&gt;d。</p>
-<p>第六步：这一步是关键的一步，也是解释为什么“高速公路”会被短边所取代的一步。注意三点，一、目前结构中的所有节点的友节点数量都为4。二、4个友节点是所有节点友节点数量的上限。三、每个节点之间都是双向箭头连接。当f节点插入图中时，有a节点、b节点、c节点、d节点和e节点5个节点可供选择。因为友节点的上限为4个，所以f节点只能选中这5个节点中离自己最近的四个节点作为自己的友节点即a节点、b节点、c节点和d节点。当插入f节点后，相应的更新a节点、b节点、c节点和d节点的友节点。a-48-&gt;e-73-&gt;b-90-&gt;c-120-&gt;d、b<strong>-52-&gt;f</strong>-73-&gt;a-85-&gt;d-88-&gt;c<del>-99-&gt;e</del>、c-39-&gt;d-59-&gt;e<strong>-87-&gt;f</strong>-88-&gt;b<del>-90-&gt;a</del>、d-39-&gt;c<strong>-56-&gt;f</strong>-85-&gt;b-101-&gt;e<del>-120-&gt;a</del>、e-48-&gt;a-59-&gt;c-99-&gt;b-101-&gt;d、f-52-&gt;b-56-&gt;d-87-&gt;c-121-&gt;a</p>
-<p>​        更新a: f节点和a节点之间的距离为121，大于a节点友节点中距离a节点最远的节点d（120），所以a节点不需要更新友节点。a-48-&gt;e-73-&gt;b-90-&gt;c-120-&gt;d</p>
-<p>​        更新b： f节点和b节点之间的距离为52，小于b节点友节点中距离b节点最远的节点e（99），所以b节点剔除当前最远的友节点e，并加入新的节点f。b<strong>-52-&gt;f</strong>-73-&gt;a-85-&gt;d-88-&gt;c<del>-99-&gt;e</del></p>
-<p>​        更新c： f节点和c节点之间的距离为87，小于c节点友节点中距离c节点最远的节点a（90），所以c节点剔除当前最远的友节点a，并加入新的节点f。c-39-&gt;d-59-&gt;e<strong>-87-&gt;f</strong>-88-&gt;b<del>-90-&gt;a</del></p>
-<p>​        更新d： f节点和d节点之间的距离为56，小于d节点友节点中距离d节点最远的节点a（120），所以d节点剔除当前最远的友节点a，并加入新的节点f。d-39-&gt;c<strong>-56-&gt;f</strong>-85-&gt;b-101-&gt;e<del>-120-&gt;a</del></p>
-<p>​        通过上面六个点的插入，不难发现，节点的友节点在新的节点插入的过程中会不断的被更新，节点友节点中的长边“高速公路”会不断的随着新的节点的插入被短边所取代，所以就有了本节标题中所说的“逐渐被取代的“高速公路””。</p>
-<p>​        以上内容就是NSW算的全部内容。</p>
-<h6 id="（3）HNSW算法原理"><a href="#（3）HNSW算法原理" class="headerlink" title="（3）HNSW算法原理"></a>（3）HNSW算法原理</h6><p>​        接下来开始我们的正文——HNSW算法的介绍，通过上面的讲解，其实我已经讲解了HNSW80%的内容。上一节中我讲到NSW图结构中的“高速公路”会随着点的插入逐渐被短边所取代，所以在图结构最终构建完成后，图结构中的“高速公路”（长边）将会所剩无几，那么“高速公路”在查找过程中所带来的优势也会变得微乎其微。</p>
-<p>​        那么怎么样让NSW中的“高速公路”保持一定的数量呢？那就是将NSW和跳表结合起来，所以我们先来看看跳表的原理。</p>
-<img src="https://i.loli.net/2019/12/16/Jw5n68WFMPKctV7.png" alt="jumpTable.png" title="jumpTable.png" />
-
-<p>​        如上图所示，原始链表为有序链表，原始链表中的每个节点都有50%的概率添加到一级索引层，而一级索引层的节点同样也有50%的概率添加到二级索引层。当我现在要查找图中绿色节点32时，我可以分两种方法查找。方法一：在原始链表中查找，那么需要跳转11次才能到达绿色节点。方法二：先在二级索引中查找，经过两次跳转到达30节点，然后从下一级的30节点开始查找，最后再到原始链表查找，那么算上层之间的跳 转，只需要跳转6次便可到达绿色节点。</p>
-<p>​        跳表通过将节点随机的分层，保证了上层结构为“高速公路”，底层为精细查找，通过上层“高速公路”快速接近目标查找点，那么HNSW就是NSW和跳表的结合体。</p>
-<p>​        如下示意图图所示，读者应该可以明显的感觉的跳表和NSW的结合给搜索带来的优势。</p>
-<img src="https://i.loli.net/2019/12/16/DvZA7QgMJ5N4USh.png" alt="hnsw.png" title="hnsw.png" />
-
-<p>​        以上内容就是对HNSW原理的个人总结。有不准确或不到位的地方希望读者指出。如果想要进一步了解HNSW的代码实现，请到我的github上下载源码，代码来自于<a href="https://github.com/kakao/n2.git，我只是对里面的参数和关键代码添加了注解，希望可以帮助读者更加轻松的理解代码意思，下载地址为：https://github.com/MartinNum/HNSW_explain.git。下面附上内存模型图，图中的参数对应代码中的参数，读者可以结合内存模型图理解代码。" target="_blank" rel="noopener">https://github.com/kakao/n2.git，我只是对里面的参数和关键代码添加了注解，希望可以帮助读者更加轻松的理解代码意思，下载地址为：https://github.com/MartinNum/HNSW_explain.git。下面附上内存模型图，图中的参数对应代码中的参数，读者可以结合内存模型图理解代码。</a></p>
-<img src="https://i.loli.net/2019/12/16/Y8BFC3HUhlEDckb.png" alt="HNSW_memory_model.png" title="HNSW_memory_model.png" />
-
-
-
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/12/16/HNSW%E5%8E%9F%E7%90%86/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
   
+
   
 
 
@@ -501,8 +370,8 @@
     <script>
 	var yiliaConfig = {
 		mathjax: false,
-		isHome: true,
-		isPost: false,
+		isHome: false,
+		isPost: true,
 		isArchive: false,
 		isTag: false,
 		isCategory: false,
