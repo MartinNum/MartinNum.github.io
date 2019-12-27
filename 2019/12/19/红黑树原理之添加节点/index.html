@@ -8,12 +8,12 @@
   <link rel="dns-prefetch" href="http://yoursite.com">
   <title>红黑树原理之添加节点 | Martin&#39;s blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="前言在网上看了很多写红黑树的博客，大部分写的都不是很到位，有些关于红黑树的图都是有问题的，很多都没有说清楚什么情况促发哪种操作，看完之后还是不理解，在查看了很多资料之后，决定自己写关于红黑树的理解。分为添加节点篇和删除节点篇，本文为将阐述红黑树的基本原理以及在添加节点时，各种情况下对应的操作。（在看本文前，需要先了解二叉平衡树的原理，因为红黑树的有些操作和二叉平衡树类似）">
+  <meta name="description" content="前言在网上看了很多写红黑树的博客，大部分写的都不是很到位，有些关于红黑树的图都是有问题的，很多都没有说清楚什么情况促发哪种操作，看完之后还是不理解，在查看了很多资料之后，决定自己写关于红黑树的理解。分为添加节点篇和删除节点篇，本文为将阐述红黑树的基本原理以及在添加节点时，各种情况下对应的操作。（在看本文前，需要先了解平衡二叉树的原理，因为红黑树的有些操作和二叉平衡树类似）">
 <meta property="og:type" content="article">
 <meta property="og:title" content="红黑树原理之添加节点">
 <meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;12&#x2F;19&#x2F;%E7%BA%A2%E9%BB%91%E6%A0%91%E5%8E%9F%E7%90%86%E4%B9%8B%E6%B7%BB%E5%8A%A0%E8%8A%82%E7%82%B9&#x2F;index.html">
 <meta property="og:site_name" content="Martin&#39;s blog">
-<meta property="og:description" content="前言在网上看了很多写红黑树的博客，大部分写的都不是很到位，有些关于红黑树的图都是有问题的，很多都没有说清楚什么情况促发哪种操作，看完之后还是不理解，在查看了很多资料之后，决定自己写关于红黑树的理解。分为添加节点篇和删除节点篇，本文为将阐述红黑树的基本原理以及在添加节点时，各种情况下对应的操作。（在看本文前，需要先了解二叉平衡树的原理，因为红黑树的有些操作和二叉平衡树类似）">
+<meta property="og:description" content="前言在网上看了很多写红黑树的博客，大部分写的都不是很到位，有些关于红黑树的图都是有问题的，很多都没有说清楚什么情况促发哪种操作，看完之后还是不理解，在查看了很多资料之后，决定自己写关于红黑树的理解。分为添加节点篇和删除节点篇，本文为将阐述红黑树的基本原理以及在添加节点时，各种情况下对应的操作。（在看本文前，需要先了解平衡二叉树的原理，因为红黑树的有些操作和二叉平衡树类似）">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https:&#x2F;&#x2F;img03.sogoucdn.com&#x2F;app&#x2F;a&#x2F;100520146&#x2F;1d284cbe92cfb711759a7d7da50f663a">
 <meta property="og:image" content="https:&#x2F;&#x2F;img02.sogoucdn.com&#x2F;app&#x2F;a&#x2F;100520146&#x2F;dfc343cdabd659515ef08ffc7b46fc5b">
@@ -23,7 +23,7 @@
 <meta property="og:image" content="https:&#x2F;&#x2F;s2.ax1x.com&#x2F;2019&#x2F;12&#x2F;20&#x2F;QOvyVA.png">
 <meta property="og:image" content="https:&#x2F;&#x2F;s2.ax1x.com&#x2F;2019&#x2F;12&#x2F;20&#x2F;QXm1fS.png">
 <meta property="article:published_time" content="2019-12-19T12:38:42.000Z">
-<meta property="article:modified_time" content="2019-12-22T13:50:12.251Z">
+<meta property="article:modified_time" content="2019-12-27T01:37:26.391Z">
 <meta property="article:author" content="Never say die">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https:&#x2F;&#x2F;img03.sogoucdn.com&#x2F;app&#x2F;a&#x2F;100520146&#x2F;1d284cbe92cfb711759a7d7da50f663a">
@@ -170,7 +170,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>在网上看了很多写红黑树的博客，大部分写的都不是很到位，有些关于红黑树的图都是有问题的，很多都没有说清楚什么情况促发哪种操作，看完之后还是不理解，在查看了很多资料之后，决定自己写关于红黑树的理解。分为添加节点篇和删除节点篇，本文为将阐述红黑树的基本原理以及在添加节点时，各种情况下对应的操作。（在看本文前，需要先了解二叉平衡树的原理，因为红黑树的有些操作和二叉平衡树类似）</p>
+        <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>在网上看了很多写红黑树的博客，大部分写的都不是很到位，有些关于红黑树的图都是有问题的，很多都没有说清楚什么情况促发哪种操作，看完之后还是不理解，在查看了很多资料之后，决定自己写关于红黑树的理解。分为添加节点篇和删除节点篇，本文为将阐述红黑树的基本原理以及在添加节点时，各种情况下对应的操作。（在看本文前，需要先了解平衡二叉树的原理，因为红黑树的有些操作和二叉平衡树类似）</p>
  <a id="more"></a> 
 
 <h3 id="红黑树（R-B-Tree）简介"><a href="#红黑树（R-B-Tree）简介" class="headerlink" title="红黑树（R-B Tree）简介"></a>红黑树（R-B Tree）简介</h3><p>红黑树之所以被称为红黑树，是因为红黑树的节点的颜色非红即黑，通过对节点颜色的限制和一系列的限制条件来确保红黑树没有任何一条路径是其他路径的两倍长。</p>
