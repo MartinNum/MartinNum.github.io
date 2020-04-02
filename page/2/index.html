@@ -160,10 +160,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="第三章"><a href="#第三章" class="headerlink" title="第三章"></a>第三章</h1><h3 id="对象死活"><a href="#对象死活" class="headerlink" title="对象死活"></a>对象死活</h3><h6 id="引用计数算法"><a href="#引用计数算法" class="headerlink" title="引用计数算法"></a>引用计数算法</h6><p>原理：给对象添加一个引用计数器，当有地方引用它时，计数器值就加1；当引用失效时，计数器值减1；任何时刻计数器值为0就表示该对象不可能在被使用。</p>
-<p>优点：实现简单，判断效率高。</p>
-<p>缺点：无法解决对象之间相互引用的问题。</p>
-<h6 id="可达性分析算法"><a href="#可达性分析算法" class="headerlink" title="可达性分析算法"></a>可达性分析算法</h6><p>原理：通过一系列称为“GC Roots”的对象作为起始点，从这些节点开始向下搜索，搜索所走过的路径称为引用链(Reference Chain)，当一个对象到GC Roots没有任何引用链相连时，则证明此对象是不可用的。</p>
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>对JVM第三章的知识点进行总结，同时方便自己以后的回顾。</p>
         
       
 
@@ -226,10 +223,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="第二章"><a href="#第二章" class="headerlink" title="第二章"></a>第二章</h1><h3 id="Java虚拟机的多线程"><a href="#Java虚拟机的多线程" class="headerlink" title="Java虚拟机的多线程"></a>Java虚拟机的多线程</h3><p>通过线程轮流切换并分配处理器执行时间的方式实现</p>
-<h3 id="程序计数器"><a href="#程序计数器" class="headerlink" title="程序计数器"></a>程序计数器</h3><p>如果执行的是Java方法，计数器记录的是正在执行的虚拟机字节码指令的地址，字节码解释器通过改变计数器的值来选取下一条需要执行的字节码指令，分支、循环、跳转、异常处理、线程恢复等基本功能都需要依赖这个计数器来完成。</p>
-<h6 id="线程私有"><a href="#线程私有" class="headerlink" title="线程私有"></a>线程私有</h6><p>各个线程之间计数器互不影响，独立存储。</p>
-<h6 id="OutOfMemoryError：无，唯一"><a href="#OutOfMemoryError：无，唯一" class="headerlink" title="OutOfMemoryError：无，唯一"></a>OutOfMemoryError：无，唯一</h6>
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>对JVM第二章的知识点进行总结，同时方便自己以后的回顾。</p>
         
       
 
@@ -292,7 +286,8 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="HNSW原理"><a href="#HNSW原理" class="headerlink" title="HNSW原理"></a>HNSW原理</h1><h3 id="一、NSW原理"><a href="#一、NSW原理" class="headerlink" title="一、NSW原理"></a>一、NSW原理</h3><p>​        HNSW近邻搜索算法是在NSW近邻搜索算法的基础上改进而来，实际上NSW可以说的HNSW的组成部分。所以在介绍HNSW之前，我先介绍NSW算法原理，在理解了NSW原理之后，也就理解了百分之八十的HNSW原理。下面我们开始NSW的学习之旅。    </p>
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>HNSW用于近似最近邻搜索，下面将首先讲解HSNW的构建原理，为了方便读者阅读HNSW源码，避免被HNSW繁杂的参数弄的晕头转向，我还附上了HSNW索引的内存模型图，图中的参数对应HNSW源码中的参数，读者可以不理解参数所代表的意思时对着索引内存模型图。结尾附上了带中文注释的源码地址。</p>
+<h3 id="一、NSW原理"><a href="#一、NSW原理" class="headerlink" title="一、NSW原理"></a>一、NSW原理</h3><p>​        HNSW近邻搜索算法是在NSW近邻搜索算法的基础上改进而来，实际上NSW可以说的HNSW的组成部分。所以在介绍HNSW之前，我先介绍NSW算法原理，在理解了NSW原理之后，也就理解了百分之八十的HNSW原理。下面我们开始NSW的学习之旅。    </p>
 <p>​        在理想状态下，一个优秀的近邻搜索算法应该包含三点，一、构图算法的时间复杂度低。二、查找目标点的查找效率高。三、具备“高沙公路“机制（相距较远的点之间的连线，用于快速接近目标节点）。</p>
         
       

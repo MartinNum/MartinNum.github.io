@@ -160,9 +160,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h2 id="所属类的不用"><a href="#所属类的不用" class="headerlink" title="所属类的不用"></a>所属类的不用</h2><p>sleep()是Thread类的方法，wait()是Object的方法。</p>
-<h2 id="调用条件"><a href="#调用条件" class="headerlink" title="调用条件"></a>调用条件</h2><p>没有前提条件，线程可以随时调用。</p>
-<p>线程在调用wait()方法之前必须先获得wait()方法所在对象的锁</p>
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>wait()方法被应用与条件队列，通常与notifyAll()方法组合使用，wait()方法会使不满足状态的线程进入等待池等待，sleep()方法也会让线程休眠，那么两者的区别是什么。在参阅的相关资料后做出一下总结。</p>
         
       
 
@@ -225,8 +223,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h2 id="String的基础"><a href="#String的基础" class="headerlink" title="String的基础"></a>String的基础</h2><p>String被声明为final，因此String类不可被继承。在Java 8中，String类使用char数组存储字符串。并且char数组被声明为fianl，即保证了String不可变。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">String</span></span></span><br><span class="line"><span class="class">    <span class="keyword">implements</span> <span class="title">java</span>.<span class="title">io</span>.<span class="title">Serializable</span>, <span class="title">Comparable</span>&lt;<span class="title">String</span>&gt;, <span class="title">CharSequence</span> </span>&#123;</span><br><span class="line">    <span class="comment">/** The value is used for character storage. */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">char</span> value[];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>下面对String类的创建方式和如何判断两个String类是否相等做了总结。</p>
         
       
 
@@ -352,7 +349,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h5 id="题目41：-输入一个递增排序的数组和一个数字S，在数组中查找两个数，使得他们的和正好是S，如果有多对数字的和等于S，输出两个数的乘积最小的。"><a href="#题目41：-输入一个递增排序的数组和一个数字S，在数组中查找两个数，使得他们的和正好是S，如果有多对数字的和等于S，输出两个数的乘积最小的。" class="headerlink" title="题目41： 输入一个递增排序的数组和一个数字S，在数组中查找两个数，使得他们的和正好是S，如果有多对数字的和等于S，输出两个数的乘积最小的。"></a>题目41： 输入一个递增排序的数组和一个数字S，在数组中查找两个数，使得他们的和正好是S，如果有多对数字的和等于S，输出两个数的乘积最小的。</h5><h6 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h6><h6 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h6><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ArrayList&lt;Integer&gt; <span class="title">FindNumbersWithSum</span><span class="params">(<span class="keyword">int</span> [] array, <span class="keyword">int</span> sum)</span> </span>&#123;</span><br><span class="line">        ArrayList&lt;Integer&gt; resList = <span class="keyword">new</span> ArrayList&lt;&gt;(<span class="number">2</span>);</span><br><span class="line">        <span class="keyword">if</span>(array == <span class="keyword">null</span> || array.length &lt; <span class="number">2</span>)</span><br><span class="line">            <span class="keyword">return</span> resList;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> start = <span class="number">0</span>, end = array.length-<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">while</span>(start &lt; end)&#123;</span><br><span class="line">            <span class="keyword">int</span> curSum = array[start] + array[end];</span><br><span class="line">            <span class="keyword">if</span>(curSum == sum)&#123;</span><br><span class="line">                resList.add(array[start]);</span><br><span class="line">                resList.add(array[end]);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;<span class="keyword">else</span> <span class="keyword">if</span>(curSum &gt; sum)&#123;</span><br><span class="line">                end--;</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                start++;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> resList;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>对于<strong>剑指offer</strong>中21-66道算法题的解题思路和代码总结。</p>
         
       
 
@@ -547,7 +544,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h5 id="题目1：-在一个二维数组中（每个一维数组的长度相同），每一行都按照从左到右递增的顺序排序，每一列都按照从上到下递增的顺序排序。请完成一个函数，输入这样的一个二维数组和一个整数，判断数组中是否含有该整数。"><a href="#题目1：-在一个二维数组中（每个一维数组的长度相同），每一行都按照从左到右递增的顺序排序，每一列都按照从上到下递增的顺序排序。请完成一个函数，输入这样的一个二维数组和一个整数，判断数组中是否含有该整数。" class="headerlink" title="题目1： 在一个二维数组中（每个一维数组的长度相同），每一行都按照从左到右递增的顺序排序，每一列都按照从上到下递增的顺序排序。请完成一个函数，输入这样的一个二维数组和一个整数，判断数组中是否含有该整数。"></a>题目1： 在一个二维数组中（每个一维数组的长度相同），每一行都按照从左到右递增的顺序排序，每一列都按照从上到下递增的顺序排序。请完成一个函数，输入这样的一个二维数组和一个整数，判断数组中是否含有该整数。</h5><h6 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h6><p>首先判断二维数组是否为空，为空则直接返回false，由于这个二维数组从左到右，从上到下都是递增的，因此数组的左上角数字是最小的，右下角数字是最大的。当选择左上角或者右下角数字为遍历的起始节点时，遍历的方向不唯一，所以只能从左下角和右上角中选着一个作为遍历的起始点，因为遍历方向是唯一的。下图为一个二维数组，右上角为查询的起始节点，查询点为16。</p>
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>对于<strong>剑指offer</strong>中前20道算法题的解题思路和代码总结。</p>
         
       
 
@@ -610,7 +607,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h5 id="题目21-从上往下打印出二叉树的每个节点，同层节点从左至右打印。"><a href="#题目21-从上往下打印出二叉树的每个节点，同层节点从左至右打印。" class="headerlink" title="题目21: 从上往下打印出二叉树的每个节点，同层节点从左至右打印。"></a>题目21: 从上往下打印出二叉树的每个节点，同层节点从左至右打印。</h5><h6 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h6><p>使用队列先进先出的原理实现</p>
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>对于<strong>剑指offer</strong>中21-40的算法题的解题思路和代码总结。</p>
         
       
 
