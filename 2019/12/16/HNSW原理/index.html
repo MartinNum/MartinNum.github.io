@@ -8,12 +8,12 @@
   <link rel="dns-prefetch" href="http://yoursite.com">
   <title>HNSW原理 | Martin&#39;s blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="前言HNSW用于近似最近邻搜索，下面将首先讲解HSNW的构建原理，为了方便读者阅读HNSW源码，避免被HNSW繁杂的参数弄的晕头转向，我还附上了HSNW索引的内存模型图，图中的参数对应HNSW源码中的参数，读者可以不理解参数所代表的意思时对着索引内存模型图。结尾附上了带中文注释的源码地址。 一、NSW原理​        HNSW近邻搜索算法是在NSW近邻搜索算法的基础上改进而来，实际上NSW可以">
+  <meta name="description" content="前言HNSW用于近似最近邻搜索，下面将首先讲解HSNW的构建原理，为了方便读者阅读HNSW源码，避免被HNSW繁杂的参数弄的晕头转向，我还附上了HSNW索引的内存模型图，图中的参数对应HNSW源码中的参数，读者可以不理解参数所代表的意思时对着索引内存模型图。结尾附上了带中文注释的源码地址。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="HNSW原理">
 <meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;12&#x2F;16&#x2F;HNSW%E5%8E%9F%E7%90%86&#x2F;index.html">
 <meta property="og:site_name" content="Martin&#39;s blog">
-<meta property="og:description" content="前言HNSW用于近似最近邻搜索，下面将首先讲解HSNW的构建原理，为了方便读者阅读HNSW源码，避免被HNSW繁杂的参数弄的晕头转向，我还附上了HSNW索引的内存模型图，图中的参数对应HNSW源码中的参数，读者可以不理解参数所代表的意思时对着索引内存模型图。结尾附上了带中文注释的源码地址。 一、NSW原理​        HNSW近邻搜索算法是在NSW近邻搜索算法的基础上改进而来，实际上NSW可以">
+<meta property="og:description" content="前言HNSW用于近似最近邻搜索，下面将首先讲解HSNW的构建原理，为了方便读者阅读HNSW源码，避免被HNSW繁杂的参数弄的晕头转向，我还附上了HSNW索引的内存模型图，图中的参数对应HNSW源码中的参数，读者可以不理解参数所代表的意思时对着索引内存模型图。结尾附上了带中文注释的源码地址。">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https:&#x2F;&#x2F;i.loli.net&#x2F;2019&#x2F;12&#x2F;16&#x2F;kezlnC9Hiw3ROPr.png">
 <meta property="og:image" content="https:&#x2F;&#x2F;i.loli.net&#x2F;2019&#x2F;12&#x2F;16&#x2F;CHAFXsW8bDEi5o9.png">
@@ -21,7 +21,7 @@
 <meta property="og:image" content="https:&#x2F;&#x2F;i.loli.net&#x2F;2019&#x2F;12&#x2F;16&#x2F;DvZA7QgMJ5N4USh.png">
 <meta property="og:image" content="https:&#x2F;&#x2F;i.loli.net&#x2F;2019&#x2F;12&#x2F;16&#x2F;Y8BFC3HUhlEDckb.png">
 <meta property="article:published_time" content="2019-12-16T09:46:25.000Z">
-<meta property="article:modified_time" content="2020-04-02T15:38:37.031Z">
+<meta property="article:modified_time" content="2020-04-02T15:59:28.398Z">
 <meta property="article:author" content="Never say die">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https:&#x2F;&#x2F;i.loli.net&#x2F;2019&#x2F;12&#x2F;16&#x2F;kezlnC9Hiw3ROPr.png">
@@ -169,10 +169,10 @@
     <div class="article-entry" itemprop="articleBody">
       
         <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>HNSW用于近似最近邻搜索，下面将首先讲解HSNW的构建原理，为了方便读者阅读HNSW源码，避免被HNSW繁杂的参数弄的晕头转向，我还附上了HSNW索引的内存模型图，图中的参数对应HNSW源码中的参数，读者可以不理解参数所代表的意思时对着索引内存模型图。结尾附上了带中文注释的源码地址。</p>
-<h3 id="一、NSW原理"><a href="#一、NSW原理" class="headerlink" title="一、NSW原理"></a>一、NSW原理</h3><p>​        HNSW近邻搜索算法是在NSW近邻搜索算法的基础上改进而来，实际上NSW可以说的HNSW的组成部分。所以在介绍HNSW之前，我先介绍NSW算法原理，在理解了NSW原理之后，也就理解了百分之八十的HNSW原理。下面我们开始NSW的学习之旅。    </p>
-<p>​        在理想状态下，一个优秀的近邻搜索算法应该包含三点，一、构图算法的时间复杂度低。二、查找目标点的查找效率高。三、具备“高沙公路“机制（相距较远的点之间的连线，用于快速接近目标节点）。</p>
  <a id="more"></a> 
 
+<h3 id="一、NSW原理"><a href="#一、NSW原理" class="headerlink" title="一、NSW原理"></a>一、NSW原理</h3><p>​        HNSW近邻搜索算法是在NSW近邻搜索算法的基础上改进而来，实际上NSW可以说的HNSW的组成部分。所以在介绍HNSW之前，我先介绍NSW算法原理，在理解了NSW原理之后，也就理解了百分之八十的HNSW原理。下面我们开始NSW的学习之旅。    </p>
+<p>​        在理想状态下，一个优秀的近邻搜索算法应该包含三点，一、构图算法的时间复杂度低。二、查找目标点的查找效率高。三、具备“高沙公路“机制（相距较远的点之间的连线，用于快速接近目标节点）。</p>
 <h6 id=""><a href="#" class="headerlink" title=""></a><img src="https://i.loli.net/2019/12/16/kezlnC9Hiw3ROPr.png" alt="highway.png" title="highway.png" /></h6><p>​        上图为NSW算法的结构图（随意画的），假设有一个二维的平面，我们现在把图中的二维数据向量随机的逐个插入到平面直角坐标系中，他们的位置关系如上图所示。为了让读者更好的理解“高速公路机制”，我来解释一下上图的原理。黑色的线连接的两个点，表示这两个点是近邻关系。红色的线就是“高速公路”机制。假设我要查找的是图中的绿点query的近邻点，并且查找的出发点为图中的a节点（随机出发点），我们计算节点a的所有友节点距离节点query的距离，并得到节点b是a节点所有友节点中距离查找点query最近的点，于是就跳转到节点b，并以节点b为下一个出发点继续查找，发生在节点a上的过程一模一样的发生在节点b上，于是我们就找到了节点c，在遍历节点c的有节点时，我们发现节点c的所有友节点距离节点query的距离都没有比节点c本身距离节点query的距离更近，于是节点c就是我们要找的距离query最近的点。</p>
 <p>​        通过上面的例子我们可以明显的感觉到“高速公路”机制在查找中起到的重要作用，通过“高速公路”我们可以快速的到达目标节点附近，大大的减少了节点之间的跳转，很大的提升了查找的效率。</p>
 <p>​        接下来我来谈一谈“高速公路”机制形成的过程。在构图算法够造节点之间结构的时候，点是随机插入的，这就表明在早期的图构建的时候，出现“高速公路”的概率会非常的大，假如我们要构建的图由一百万个节点组成，节点的友节点数量设置为4。在插入第10个节点的时候，我只能在前9个节点中选出4个距离最近的友节点，我选择的余地很小，只有9个节点可供选择，所以选出来的4个友节点基本上并不是真正意义上的距离当前节点最近的友节点，这时候“高速公路”就出现了。那么在什么时候更加容易出现呢？这个问题的答案很明显，只有在构建图早期选择余地小的时候更容易出现高速公路。举个极端的例子，当我在插入第一百万个节点时，图结构已经被训练了999999，所以在当前图中查找到的友节点一定是当前图中真正意义上的近邻。</p>
