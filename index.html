@@ -140,6 +140,68 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-使用Texstudio时遇到的问题" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/04/07/%E4%BD%BF%E7%94%A8Texstudio%E6%97%B6%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/">使用Texstudio时遇到的问题</a>
+    </h1>
+  
+
+        
+        <a href="/2020/04/07/%E4%BD%BF%E7%94%A8Texstudio%E6%97%B6%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/" class="archive-article-date">
+  	<time datetime="2020-04-07T05:49:45.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-04-07</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/04/07/%E4%BD%BF%E7%94%A8Texstudio%E6%97%B6%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-类加载过程与对象的创建" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -161,12 +223,39 @@
     <div class="article-entry" itemprop="articleBody">
       
         <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>本篇主要用来记录JAVA类加载过程以及对象的创建过程。阐述他们之间的关系以及自己学习过程中的疑惑。</p>
-<h2 id="类加载过程"><a href="#类加载过程" class="headerlink" title="类加载过程"></a>类加载过程</h2><p>类加载过程是指jvm把通过.java文件编译生成的.class文件中的类信息加载进内存的过程。jvm不会一次性把所有的类都加载进内存，只有需要某个类时才会加载且每个类只会被加载一次。</p>
+<h2 id="1-类加载过程"><a href="#1-类加载过程" class="headerlink" title="1. 类加载过程"></a>1. 类加载过程</h2><p>类加载过程是指jvm把通过.java文件编译生成的.class文件中的类信息加载 进内存的过程。</p>
 <p>类加载过程可分为加载、链接和初始化。初始化又可以被细分为验证、准备和解析。 </p>
 <img src="https://img01.sogoucdn.com/app/a/100520146/be56153b19501aa9560bd195e1099225" alt="类加载过程.png" title="类加载过程.png" />
 
 <h4 id="加载"><a href="#加载" class="headerlink" title="加载"></a>加载</h4><p>类加载器可分为<strong>启动类加载器</strong>（Bootstrap ClassLoader）、<strong>扩张类加载器</strong>（Extension ClassLoader）和<strong>应用类加载器</strong>（Application ClassLoader）。他们之间的继承关系如下图所示。</p>
 <img src="https://img02.sogoucdn.com/app/a/100520146/2ad4a0782b36a0a1d08f1b8e98e7e676" alt="类加载器继承关系及作用.png" title="类加载器继承关系及作用.png" />
+
+<p>类加载器会动态的加载java类到虚拟机内存中，并且会按需加载，只有在需要时才对java类进行加载，并且每个类只会被加载一次。</p>
+<p>类加载器在加载Java类时会采用<strong>双亲委派模型</strong>：当类加载器在加载java类时，会先委派给父类加载，层层上传，最后会把加载任务委派给<strong>启动类加载器</strong>。只有父类类加载器无法完成这个加载任务时（搜索范围中没有找到对应的类），子加载器才会尝试自己去加载。 所以是一个向上传递再向下传递的过程。</p>
+<h4 id="验证"><a href="#验证" class="headerlink" title="验证"></a><strong>验证</strong></h4><p>验证阶段需要验证四部分内容：</p>
+<ul>
+<li>文件格式验证： 包括文件头部的魔术因子、class文件主次版本号、class文件的MD5指纹、变量类型是否支持等 </li>
+<li>元数据验证： 验证加载的类是否有父类，父类是否被final修饰(修饰不能被继承)，如果父类是否为抽象类等，如果是需要实现抽象的方法。 </li>
+<li>字节码验证： 来确保被加载的类方体不会威胁到虚拟机。 </li>
+<li>符号引用验证： 验证符号引用能否转换为直接引用，  保证解析动作的顺利执行 。</li>
+</ul>
+<h4 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> classValue = <span class="number">10</span>;</span><br></pre></td></tr></table></figure>
+
+<p>类变量classValue被附上默认初值0。 比如8种<strong>基本类型</strong>的初值，默认为0；<strong>引用类型</strong>的初值则为null；<strong>常量</strong>的初值即为代码中设置的值。</p>
+<h4 id="解析"><a href="#解析" class="headerlink" title="解析"></a>解析</h4><p>解析就是在常量池中寻找类、接口、字段和方法的符号引用，并且将这些符号引用替换成直接引用的过程。 </p>
+<h4 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h4><p>为所有静态变量赋代码中指定的值。类变量classValue被附上初值10。</p>
+<h2 id="2-对象创建过程"><a href="#2-对象创建过程" class="headerlink" title="2. 对象创建过程"></a>2. 对象创建过程</h2><p>（1）<strong>类加载检查检查</strong>：首先检查new指令的参数能否在常量池中定位到一个类的符号引用。这个符号引用代表的类是否已被加载、解析和初始化过。如果没有，那必须先执行相应的类加载过程。</p>
+<p>（2）<strong>分配内存</strong>：虚拟机为新生的对象分配内存，对象所需的内存大小在类加载完成后便可完全确定。</p>
+<p>（3）<strong>初始化</strong>：内存分配完成后，虚拟机会把分配到的内存空间都初始化为零值（不包括对象头），保证了对象实例字段在Java代码中可以不赋初值就可以直接使用。</p>
+<p>（4）<strong>设置对象头</strong>：虚拟机要对对象进行必要的设置，例如这个对象是哪个类的实例、如何才能找到类的元数据信息、对象的哈希码、对象的GC分代年龄等信息。这些信息存放在对象的对象头中。</p>
+<p>（5）<strong>执行&lt;init&gt;方法</strong>：把对象按照程序员的意愿进行初始化。</p>
+<h2 id="疑问"><a href="#疑问" class="headerlink" title="疑问"></a>疑问</h2><h4 id="为什么类加载器要实现双亲委派模型？"><a href="#为什么类加载器要实现双亲委派模型？" class="headerlink" title="为什么类加载器要实现双亲委派模型？"></a>为什么类加载器要实现双亲委派模型？</h4><ol>
+<li>避免类的重复加载：父类如果已经加载过，子类就不用重复加载。</li>
+<li>消除安全隐患：如果不使用双亲委派模型，比如用户可以任意实现自己的String类，并用引用类加载器加载。那么自定义的String类就会和java核心库中的String类冲突 ，这样回导致非常大的安全隐患。</li>
+</ol>
+<h4 id="如何打破双亲委派模型？"><a href="#如何打破双亲委派模型？" class="headerlink" title="如何打破双亲委派模型？"></a>如何打破双亲委派模型？</h4><p>默认的loadClass方法是实现了双亲委派机制的逻辑，即会先让父类加载器加载，当无法加载时才回调用findClass方法自己加载。 如果想打破双亲委派模型，那么就重写整个loadClass方法。如果不想打破双亲委派模型，只需要重写findClass方法即可。</p>
+<h4 id="为什么类加载过程和对象创建过程都存在初始化零值？"><a href="#为什么类加载过程和对象创建过程都存在初始化零值？" class="headerlink" title="为什么类加载过程和对象创建过程都存在初始化零值？"></a>为什么类加载过程和对象创建过程都存在初始化零值？</h4><p>类加载过程在准备阶段的初始化零值时针对类变量，对象创建过程中的初始化针对的时实例变量。类变量属于类，实例变量属于对象，实例变量生命周期和对象的生命周期相同。</p>
+
       
 
       
@@ -689,68 +778,6 @@
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2019/12/31/%E7%AE%97%E6%B3%95%E6%80%9D%E8%B7%AF%E6%80%BB%E7%BB%93%EF%BC%88%E4%BA%8C%EF%BC%89/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-红黑树原理之删除节点" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/12/19/%E7%BA%A2%E9%BB%91%E6%A0%91%E5%8E%9F%E7%90%86%E4%B9%8B%E5%88%A0%E9%99%A4%E8%8A%82%E7%82%B9/">红黑树原理之删除节点</a>
-    </h1>
-  
-
-        
-        <a href="/2019/12/19/%E7%BA%A2%E9%BB%91%E6%A0%91%E5%8E%9F%E7%90%86%E4%B9%8B%E5%88%A0%E9%99%A4%E8%8A%82%E7%82%B9/" class="archive-article-date">
-  	<time datetime="2019-12-19T12:40:04.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-12-19</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/12/19/%E7%BA%A2%E9%BB%91%E6%A0%91%E5%8E%9F%E7%90%86%E4%B9%8B%E5%88%A0%E9%99%A4%E8%8A%82%E7%82%B9/">展开全文 >></a>
         </p>
       
 
