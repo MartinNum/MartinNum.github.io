@@ -6,15 +6,22 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Archives: 2020 | Martin&#39;s blog</title>
+  <title>volatile解析 | Martin&#39;s blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Martin&#39;s blog">
-<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;archives&#x2F;2020&#x2F;index.html">
+  <meta name="description" content="前言volatile变量是Java提供的一种削弱的同步机制，用来确保将变量的更新操作通知到其他线程。我将在这两博客中分享自己对volatile变量的理解。 volatile特点 保证被修饰变量的不会被重排序 保证被修饰变量可见性  什么是重排序重排序是指当操作之间不存在依赖关系（Happens-Before关系）时，编译器在不改变单线程程序最终执行结果的前提下，对指令进行重排序以达到提高执行效率的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="volatile解析">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2020&#x2F;04&#x2F;10&#x2F;volatile%E8%A7%A3%E6%9E%90&#x2F;index.html">
 <meta property="og:site_name" content="Martin&#39;s blog">
+<meta property="og:description" content="前言volatile变量是Java提供的一种削弱的同步机制，用来确保将变量的更新操作通知到其他线程。我将在这两博客中分享自己对volatile变量的理解。 volatile特点 保证被修饰变量的不会被重排序 保证被修饰变量可见性  什么是重排序重排序是指当操作之间不存在依赖关系（Happens-Before关系）时，编译器在不改变单线程程序最终执行结果的前提下，对指令进行重排序以达到提高执行效率的">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="https:&#x2F;&#x2F;img01.sogoucdn.com&#x2F;app&#x2F;a&#x2F;100520146&#x2F;8d523fd397b87010ccb4ecc67e59dc06">
+<meta property="og:image" content="https:&#x2F;&#x2F;img04.sogoucdn.com&#x2F;app&#x2F;a&#x2F;100520146&#x2F;9dd83632f6b049f22877d060232b3fd8">
+<meta property="article:published_time" content="2020-04-09T16:51:30.000Z">
+<meta property="article:modified_time" content="2020-04-09T18:11:06.606Z">
 <meta property="article:author" content="Never say die">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;img01.sogoucdn.com&#x2F;app&#x2F;a&#x2F;100520146&#x2F;8d523fd397b87010ccb4ecc67e59dc06">
   
     <link rel="alternative" href="/atom.xml" title="Martin&#39;s blog" type="application/atom+xml">
   
@@ -138,265 +145,160 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
+            <article id="post-volatile解析" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
   
+    <h1 class="article-title" itemprop="name">
+      volatile解析
+    </h1>
   
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2020" class="archive-year">2020</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/04/10/volatile%E8%A7%A3%E6%9E%90/" class="archive-article-date">
+
+        
+        <a href="/2020/04/10/volatile%E8%A7%A3%E6%9E%90/" class="archive-article-date">
   	<time datetime="2020-04-09T16:51:30.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-04-10</time>
 </a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/04/10/volatile%E8%A7%A3%E6%9E%90/">volatile解析</a>
-    </h1>
-  
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>volatile变量是Java提供的一种削弱的同步机制，用来确保将变量的更新操作通知到其他线程。我将在这两博客中分享自己对volatile变量的理解。</p>
+<h4 id="volatile特点"><a href="#volatile特点" class="headerlink" title="volatile特点"></a>volatile特点</h4><ul>
+<li>保证被修饰变量的不会被重排序</li>
+<li>保证被修饰变量可见性</li>
+</ul>
+<h4 id="什么是重排序"><a href="#什么是重排序" class="headerlink" title="什么是重排序"></a>什么是重排序</h4><p>重排序是指当操作之间不存在依赖关系（Happens-Before关系）时，编译器在不改变单线程程序最终执行结果的前提下，对指令进行重排序以达到提高执行效率的目的。如下面代码中所示：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> a = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">int</span> b = <span class="number">2</span>;</span><br><span class="line"><span class="keyword">int</span> c = a + b</span><br></pre></td></tr></table></figure>
 
-        <div class="article-info info-on-right">
-          
-          
+<p>代码中a=0和b=2之间不存在依赖关系（Happens-Before关系），即他们的执行顺序不会影响最终的执行结果，所以b=2可能会被排序到a=0之前执行。但是a=0和b=2不会被重排序到c=a+b之后执行，因为他们之间存在依赖关系（Happens-Before关系）。</p>
+<h4 id="为什么要防止重排序"><a href="#为什么要防止重排序" class="headerlink" title="为什么要防止重排序"></a>为什么要防止重排序</h4><h4 id="可见性问题"><a href="#可见性问题" class="headerlink" title="可见性问题"></a>可见性问题</h4><p>在多线程的情况下回导致可见性问题，如下图所示，线程A和线程B都拥有各自的工作内存，工作内存是线程私有的，即对其他线程不可见。当线程A和线程B同时要对主存中的共享变量a进行加1操作时，会首先将共享变量a读取到自己的工作内存中，即此时线程A和线程B的工作内存中都存储了共享变量a=0的副本。</p>
+<img src="https://img01.sogoucdn.com/app/a/100520146/8d523fd397b87010ccb4ecc67e59dc06" alt="可见性操作.png" title="可见性操作.png" />
 
+<p>然后线程A和线程B分别对各自工作内存中a变量的副本进行加1操作，然后写回主存中，主存中a变量的最终结果是1，但a实际上被进行了两次加一操作。</p>
+<img src="https://img04.sogoucdn.com/app/a/100520146/9dd83632f6b049f22877d060232b3fd8" alt="可见性操作-写.png" title="可见性操作-写.png" />
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2020/04/10/volatile%E8%A7%A3%E6%9E%90/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/04/07/%E4%BD%BF%E7%94%A8Texstudio%E6%97%B6%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/" class="archive-article-date">
-  	<time datetime="2020-04-07T05:49:45.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-04-07</time>
-</a>
+<nav id="article-nav">
+  
+  
+    <a href="/2020/04/07/%E4%BD%BF%E7%94%A8Texstudio%E6%97%B6%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">使用Texstudio时遇到的问题</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/04/07/%E4%BD%BF%E7%94%A8Texstudio%E6%97%B6%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/">使用Texstudio时遇到的问题</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
+        
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#volatile特点"><span class="toc-number">1.0.1.</span> <span class="toc-text">volatile特点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#什么是重排序"><span class="toc-number">1.0.2.</span> <span class="toc-text">什么是重排序</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#为什么要防止重排序"><span class="toc-number">1.0.3.</span> <span class="toc-text">为什么要防止重排序</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#可见性问题"><span class="toc-number">1.0.4.</span> <span class="toc-text">可见性问题</span></a></li></ol></li></ol></li></ol>
+                    </div>
+                </span>
+            </div>
         </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
+        
+    </div>
+</aside>
+
+
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/04/04/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%88%9B%E5%BB%BA/" class="archive-article-date">
-  	<time datetime="2020-04-03T17:15:08.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-04-04</time>
-</a>
-        </div>
-    	 
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/04/04/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%88%9B%E5%BB%BA/">类加载过程与对象的创建</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/03/28/sleep-%E5%92%8Cwait-%E7%9A%84%E5%8C%BA%E5%88%AB/" class="archive-article-date">
-  	<time datetime="2020-03-28T15:46:48.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-28</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/03/28/sleep-%E5%92%8Cwait-%E7%9A%84%E5%8C%BA%E5%88%AB/">sleep()和wait()的区别</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/03/27/%E5%A6%82%E4%BD%95%E5%8C%BA%E5%88%86%E4%B8%A4%E4%B8%AAString%E7%B1%BB/" class="archive-article-date">
-  	<time datetime="2020-03-27T06:52:14.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-27</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/03/27/%E5%A6%82%E4%BD%95%E5%8C%BA%E5%88%86%E4%B8%A4%E4%B8%AAString%E7%B1%BB/">如何区分两个String类</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/03/06/%E9%97%AD%E9%94%81/" class="archive-article-date">
-  	<time datetime="2020-03-06T07:52:59.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-06</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/03/06/%E9%97%AD%E9%94%81/">闭锁</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/02/05/%E7%AE%97%E6%B3%95%E6%80%9D%E8%B7%AF%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%89%EF%BC%89/" class="archive-article-date">
-  	<time datetime="2020-02-05T13:21:41.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-02-05</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/02/05/%E7%AE%97%E6%B3%95%E6%80%9D%E8%B7%AF%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%89%EF%BC%89/">算法思路总结（三）</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/01/10/%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86/" class="archive-article-date">
-  	<time datetime="2020-01-10T08:07:18.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-01-10</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/01/10/%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86/">动态代理</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/01/08/linux%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/" class="archive-article-date">
-  	<time datetime="2020-01-08T10:55:03.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-01-08</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/01/08/linux%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/">linux常用命令</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
-  
-
-    
 
 
           </div>
@@ -419,8 +321,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,

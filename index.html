@@ -140,6 +140,81 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-volatile解析" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/04/10/volatile%E8%A7%A3%E6%9E%90/">volatile解析</a>
+    </h1>
+  
+
+        
+        <a href="/2020/04/10/volatile%E8%A7%A3%E6%9E%90/" class="archive-article-date">
+  	<time datetime="2020-04-09T16:51:30.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-04-10</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>volatile变量是Java提供的一种削弱的同步机制，用来确保将变量的更新操作通知到其他线程。我将在这两博客中分享自己对volatile变量的理解。</p>
+<h4 id="volatile特点"><a href="#volatile特点" class="headerlink" title="volatile特点"></a>volatile特点</h4><ul>
+<li>保证被修饰变量的不会被重排序</li>
+<li>保证被修饰变量可见性</li>
+</ul>
+<h4 id="什么是重排序"><a href="#什么是重排序" class="headerlink" title="什么是重排序"></a>什么是重排序</h4><p>重排序是指当操作之间不存在依赖关系（Happens-Before关系）时，编译器在不改变单线程程序最终执行结果的前提下，对指令进行重排序以达到提高执行效率的目的。如下面代码中所示：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> a = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">int</span> b = <span class="number">2</span>;</span><br><span class="line"><span class="keyword">int</span> c = a + b</span><br></pre></td></tr></table></figure>
+
+<p>代码中a=0和b=2之间不存在依赖关系（Happens-Before关系），即他们的执行顺序不会影响最终的执行结果，所以b=2可能会被排序到a=0之前执行。但是a=0和b=2不会被重排序到c=a+b之后执行，因为他们之间存在依赖关系（Happens-Before关系）。</p>
+<h4 id="为什么要防止重排序"><a href="#为什么要防止重排序" class="headerlink" title="为什么要防止重排序"></a>为什么要防止重排序</h4><h4 id="可见性问题"><a href="#可见性问题" class="headerlink" title="可见性问题"></a>可见性问题</h4><p>在多线程的情况下回导致可见性问题，如下图所示，线程A和线程B都拥有各自的工作内存，工作内存是线程私有的，即对其他线程不可见。当线程A和线程B同时要对主存中的共享变量a进行加1操作时，会首先将共享变量a读取到自己的工作内存中，即此时线程A和线程B的工作内存中都存储了共享变量a=0的副本。</p>
+<img src="https://img01.sogoucdn.com/app/a/100520146/8d523fd397b87010ccb4ecc67e59dc06" alt="可见性操作.png" title="可见性操作.png" />
+
+<p>然后线程A和线程B分别对各自工作内存中a变量的副本进行加1操作，然后写回主存中，主存中a变量的最终结果是1，但a实际上被进行了两次加一操作。</p>
+<img src="https://img04.sogoucdn.com/app/a/100520146/9dd83632f6b049f22877d060232b3fd8" alt="可见性操作-写.png" title="可见性操作-写.png" />
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/04/10/volatile%E8%A7%A3%E6%9E%90/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-使用Texstudio时遇到的问题" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -715,69 +790,6 @@
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2019/12/31/%E7%AE%97%E6%B3%95%E6%80%9D%E8%B7%AF%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%80%EF%BC%89/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-算法思路总结（二）" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/12/31/%E7%AE%97%E6%B3%95%E6%80%9D%E8%B7%AF%E6%80%BB%E7%BB%93%EF%BC%88%E4%BA%8C%EF%BC%89/">算法思路总结（二）</a>
-    </h1>
-  
-
-        
-        <a href="/2019/12/31/%E7%AE%97%E6%B3%95%E6%80%9D%E8%B7%AF%E6%80%BB%E7%BB%93%EF%BC%88%E4%BA%8C%EF%BC%89/" class="archive-article-date">
-  	<time datetime="2019-12-31T02:56:11.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-12-31</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>对于<strong>剑指offer</strong>中21-40的算法题的解题思路和代码总结。</p>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/12/31/%E7%AE%97%E6%B3%95%E6%80%9D%E8%B7%AF%E6%80%BB%E7%BB%93%EF%BC%88%E4%BA%8C%EF%BC%89/">展开全文 >></a>
         </p>
       
 
