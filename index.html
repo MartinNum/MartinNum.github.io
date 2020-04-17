@@ -169,11 +169,21 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> a = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">int</span> b = <span class="number">2</span>;</span><br><span class="line"><span class="keyword">int</span> c = a + b</span><br></pre></td></tr></table></figure>
 
 <p>代码中a=0和b=2之间不存在依赖关系（Happens-Before关系），即他们的执行顺序不会影响最终的执行结果，所以b=2可能会被排序到a=0之前执行。但是a=0和b=2不会被重排序到c=a+b之后执行，因为他们之间存在依赖关系（Happens-Before关系）。</p>
-<h4 id="为什么要防止重排序"><a href="#为什么要防止重排序" class="headerlink" title="为什么要防止重排序"></a>为什么要防止重排序</h4><h4 id="可见性问题"><a href="#可见性问题" class="headerlink" title="可见性问题"></a>可见性问题</h4><p>在多线程的情况下回导致可见性问题，如下图所示，线程A和线程B都拥有各自的工作内存，工作内存是线程私有的，即对其他线程不可见。当线程A和线程B同时要对主存中的共享变量a进行加1操作时，会首先将共享变量a读取到自己的工作内存中，即此时线程A和线程B的工作内存中都存储了共享变量a=0的副本。</p>
-<img src="https://img01.sogoucdn.com/app/a/100520146/8d523fd397b87010ccb4ecc67e59dc06" alt="可见性操作.png" title="可见性操作.png" />
+<h4 id="为什么要防止重排序"><a href="#为什么要防止重排序" class="headerlink" title="为什么要防止重排序"></a>为什么要防止重排序</h4><p>在单线程情况下，重排序可以给程序带来更高的执行效率。但是在多线程情况下重排序就会带来不可预测的问题。如下面代码所示。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
-<p>然后线程A和线程B分别对各自工作内存中a变量的副本进行加1操作，然后写回主存中，主存中a变量的最终结果是1，但a实际上被进行了两次加一操作。</p>
-<img src="https://img04.sogoucdn.com/app/a/100520146/9dd83632f6b049f22877d060232b3fd8" alt="可见性操作-写.png" title="可见性操作-写.png" />
+
+
+<h4 id="可见性问题"><a href="#可见性问题" class="headerlink" title="可见性问题"></a>可见性问题</h4><p>在多线程的情况下回导致可见性问题，如下图所示，线程A和线程B都拥有各自的工作内存，工作内存是线程私有的，即对其他线程不可见。主存中存在一个共享变量a=0，且线程A和线程B的工作内存中都保存了共享变量a=0的副本。如果共享变量并没有被volatile变量修饰，那么线程A或线程B对于工作内存中共享变量a的副本的修改可能不会马上刷新到主存中，也就是说线程A的工作内存中的副本a可能已经被修改成了5，但这些变化对于线程B并不可见。</p>
+<img src="https://img02.sogoucdn.com/app/a/100520146/a80d40cfdceef9cb28701d3e216fd5f0" alt="可见性问题.png" title="可见性问题.png" />
+
+<p>如下图所示，如果共享变量a是volatile变量，则线程A对于副本的修改会立即刷新到主存中并通知其他线程，被volatile修饰的变量可以保证对于变量的写操作位于读操作之前。</p>
+<img src="https://img04.sogoucdn.com/app/a/100520146/a126a7ed5f4cf3ee7e65ea69044b9058" alt="可见性.png" title="可见性.png" /> 
+
+
+
+<h4 id="volatile解决不了原子性问题"><a href="#volatile解决不了原子性问题" class="headerlink" title="volatile解决不了原子性问题"></a>volatile解决不了原子性问题</h4><p>当线程A和线程B同时要对主存中的共享变量a进行加1操作时，会首先将共享变量a读取到自己的工作内存中，即此时线程A和线程B的工作内存中都存储了共享变量a=0的副本。然后线程A和线程B分别对各自工作内存中a变量的副本进行加1操作，然后写回主存中，主存中a变量的最终结果是1，但a实际上被进行了两次加一操作。</p>
+
       
 
       
