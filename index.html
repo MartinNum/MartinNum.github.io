@@ -160,30 +160,8 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>volatile变量是Java提供的一种削弱的同步机制，用来确保将变量的更新操作通知到其他线程。我将在这两博客中分享自己对volatile变量的理解。</p>
-<h4 id="volatile特点"><a href="#volatile特点" class="headerlink" title="volatile特点"></a>volatile特点</h4><ul>
-<li>保证被修饰变量的不会被重排序</li>
-<li>保证被修饰变量可见性</li>
-</ul>
-<h4 id="什么是重排序"><a href="#什么是重排序" class="headerlink" title="什么是重排序"></a>什么是重排序</h4><p>重排序是指当操作之间不存在依赖关系（Happens-Before关系）时，编译器在不改变单线程程序最终执行结果的前提下，对指令进行重排序以达到提高执行效率的目的。如下面代码中所示：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> a = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">int</span> b = <span class="number">2</span>;</span><br><span class="line"><span class="keyword">int</span> c = a + b</span><br></pre></td></tr></table></figure>
-
-<p>代码中a=0和b=2之间不存在依赖关系（Happens-Before关系），即他们的执行顺序不会影响最终的执行结果，所以b=2可能会被排序到a=0之前执行。但是a=0和b=2不会被重排序到c=a+b之后执行，因为他们之间存在依赖关系（Happens-Before关系）。</p>
-<h4 id="为什么要防止重排序"><a href="#为什么要防止重排序" class="headerlink" title="为什么要防止重排序"></a>为什么要防止重排序</h4><p>在单线程情况下，重排序可以给程序带来更高的执行效率。但是在多线程情况下重排序就会带来不可预测的问题。如下面代码所示。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
-
-<h4 id="可见性问题"><a href="#可见性问题" class="headerlink" title="可见性问题"></a>可见性问题</h4><p>在多线程的情况下回导致可见性问题，如下图所示，线程A和线程B都拥有各自的工作内存，工作内存是线程私有的，即对其他线程不可见。主存中存在一个共享变量a=0，且线程A和线程B的工作内存中都保存了共享变量a=0的副本。如果共享变量并没有被volatile变量修饰，那么线程A或线程B对于工作内存中共享变量a的副本的修改可能不会马上刷新到主存中，也就是说线程A的工作内存中的副本a可能已经被修改成了5，但这些变化对于线程B并不可见。</p>
-<img src="https://img02.sogoucdn.com/app/a/100520146/a80d40cfdceef9cb28701d3e216fd5f0" alt="可见性问题.png" title="可见性问题.png" />
-
-<p>如下图所示，如果共享变量a是volatile变量，则线程A对于副本的修改会立即刷新到主存中并通知其他线程，被volatile修饰的变量可以保证对于变量的写操作位于读操作之前。</p>
-<img src="https://img04.sogoucdn.com/app/a/100520146/a126a7ed5f4cf3ee7e65ea69044b9058" alt="可见性.png" title="可见性.png" /> 
-
-
-
-<h4 id="volatile解决不了原子性问题"><a href="#volatile解决不了原子性问题" class="headerlink" title="volatile解决不了原子性问题"></a>volatile解决不了原子性问题</h4><p>当线程A和线程B同时要对主存中的共享变量a进行加1操作时，会首先将共享变量a读取到自己的工作内存中，即此时线程A和线程B的工作内存中都存储了共享变量a=0的副本。然后线程A和线程B分别对各自工作内存中a变量的副本进行加1操作，然后写回主存中，主存中a变量的最终结果是1，但a实际上被进行了两次加一操作。</p>
-
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>volatile变量是Java提供的一种削弱的同步机制，用来确保将变量的更新操作通知到其他线程。我将在这篇博客中分享自己对volatile变量的理解。</p>
+        
       
 
       
@@ -308,39 +286,7 @@
     <div class="article-entry" itemprop="articleBody">
       
         <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>本篇主要用来记录JAVA类加载过程以及对象的创建过程。阐述他们之间的关系以及自己学习过程中的疑惑。</p>
-<h2 id="1-类加载过程"><a href="#1-类加载过程" class="headerlink" title="1. 类加载过程"></a>1. 类加载过程</h2><p>类加载过程是指jvm把通过.java文件编译生成的.class文件中的类信息加载 进内存的过程。</p>
-<p>类加载过程可分为加载、链接和初始化。初始化又可以被细分为验证、准备和解析。 </p>
-<img src="https://img01.sogoucdn.com/app/a/100520146/be56153b19501aa9560bd195e1099225" alt="类加载过程.png" title="类加载过程.png" />
-
-<h4 id="加载"><a href="#加载" class="headerlink" title="加载"></a>加载</h4><p>类加载器可分为<strong>启动类加载器</strong>（Bootstrap ClassLoader）、<strong>扩张类加载器</strong>（Extension ClassLoader）和<strong>应用类加载器</strong>（Application ClassLoader）。他们之间的继承关系如下图所示。</p>
-<img src="https://img02.sogoucdn.com/app/a/100520146/2ad4a0782b36a0a1d08f1b8e98e7e676" alt="类加载器继承关系及作用.png" title="类加载器继承关系及作用.png" />
-
-<p>类加载器会动态的加载java类到虚拟机内存中，并且会按需加载，只有在需要时才对java类进行加载，并且每个类只会被加载一次。</p>
-<p>类加载器在加载Java类时会采用<strong>双亲委派模型</strong>：当类加载器在加载java类时，会先委派给父类加载，层层上传，最后会把加载任务委派给<strong>启动类加载器</strong>。只有父类类加载器无法完成这个加载任务时（搜索范围中没有找到对应的类），子加载器才会尝试自己去加载。 所以是一个向上传递再向下传递的过程。</p>
-<h4 id="验证"><a href="#验证" class="headerlink" title="验证"></a><strong>验证</strong></h4><p>验证阶段需要验证四部分内容：</p>
-<ul>
-<li>文件格式验证： 包括文件头部的魔术因子、class文件主次版本号、class文件的MD5指纹、变量类型是否支持等 </li>
-<li>元数据验证： 验证加载的类是否有父类，父类是否被final修饰(修饰不能被继承)，如果父类是否为抽象类等，如果是需要实现抽象的方法。 </li>
-<li>字节码验证： 来确保被加载的类方体不会威胁到虚拟机。 </li>
-<li>符号引用验证： 验证符号引用能否转换为直接引用，  保证解析动作的顺利执行 。</li>
-</ul>
-<h4 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> classValue = <span class="number">10</span>;</span><br></pre></td></tr></table></figure>
-
-<p>类变量classValue被附上默认初值0。 比如8种<strong>基本类型</strong>的初值，默认为0；<strong>引用类型</strong>的初值则为null；<strong>常量</strong>的初值即为代码中设置的值。</p>
-<h4 id="解析"><a href="#解析" class="headerlink" title="解析"></a>解析</h4><p>解析就是在常量池中寻找类、接口、字段和方法的符号引用，并且将这些符号引用替换成直接引用的过程。 </p>
-<h4 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h4><p>为所有静态变量赋代码中指定的值。类变量classValue被附上初值10。</p>
-<h2 id="2-对象创建过程"><a href="#2-对象创建过程" class="headerlink" title="2. 对象创建过程"></a>2. 对象创建过程</h2><p>（1）<strong>类加载检查检查</strong>：首先检查new指令的参数能否在常量池中定位到一个类的符号引用。这个符号引用代表的类是否已被加载、解析和初始化过。如果没有，那必须先执行相应的类加载过程。</p>
-<p>（2）<strong>分配内存</strong>：虚拟机为新生的对象分配内存，对象所需的内存大小在类加载完成后便可完全确定。</p>
-<p>（3）<strong>初始化</strong>：内存分配完成后，虚拟机会把分配到的内存空间都初始化为零值（不包括对象头），保证了对象实例字段在Java代码中可以不赋初值就可以直接使用。</p>
-<p>（4）<strong>设置对象头</strong>：虚拟机要对对象进行必要的设置，例如这个对象是哪个类的实例、如何才能找到类的元数据信息、对象的哈希码、对象的GC分代年龄等信息。这些信息存放在对象的对象头中。</p>
-<p>（5）<strong>执行&lt;init&gt;方法</strong>：把对象按照程序员的意愿进行初始化。</p>
-<h2 id="疑问"><a href="#疑问" class="headerlink" title="疑问"></a>疑问</h2><h4 id="为什么类加载器要实现双亲委派模型？"><a href="#为什么类加载器要实现双亲委派模型？" class="headerlink" title="为什么类加载器要实现双亲委派模型？"></a>为什么类加载器要实现双亲委派模型？</h4><ol>
-<li>避免类的重复加载：父类如果已经加载过，子类就不用重复加载。</li>
-<li>消除安全隐患：如果不使用双亲委派模型，比如用户可以任意实现自己的String类，并用引用类加载器加载。那么自定义的String类就会和java核心库中的String类冲突 ，这样回导致非常大的安全隐患。</li>
-</ol>
-<h4 id="如何打破双亲委派模型？"><a href="#如何打破双亲委派模型？" class="headerlink" title="如何打破双亲委派模型？"></a>如何打破双亲委派模型？</h4><p>默认的loadClass方法是实现了双亲委派机制的逻辑，即会先让父类加载器加载，当无法加载时才回调用findClass方法自己加载。 如果想打破双亲委派模型，那么就重写整个loadClass方法。如果不想打破双亲委派模型，只需要重写findClass方法即可。</p>
-<h4 id="为什么类加载过程和对象创建过程都存在初始化零值？"><a href="#为什么类加载过程和对象创建过程都存在初始化零值？" class="headerlink" title="为什么类加载过程和对象创建过程都存在初始化零值？"></a>为什么类加载过程和对象创建过程都存在初始化零值？</h4><p>类加载过程在准备阶段的初始化零值时针对类变量，对象创建过程中的初始化针对的时实例变量。类变量属于类，实例变量属于对象，实例变量生命周期和对象的生命周期相同。</p>
-
+        
       
 
       

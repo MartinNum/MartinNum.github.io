@@ -8,20 +8,20 @@
   <link rel="dns-prefetch" href="http://yoursite.com">
   <title>类加载过程与对象的创建 | Martin&#39;s blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="前言本篇主要用来记录JAVA类加载过程以及对象的创建过程。阐述他们之间的关系以及自己学习过程中的疑惑。 1. 类加载过程类加载过程是指jvm把通过.java文件编译生成的.class文件中的类信息加载 进内存的过程。 类加载过程可分为加载、链接和初始化。初始化又可以被细分为验证、准备和解析。    加载类加载器可分为启动类加载器（Bootstrap ClassLoader）、扩张类加载器（Exte">
+  <meta name="description" content="前言本篇主要用来记录JAVA类加载过程以及对象的创建过程。阐述他们之间的关系以及自己学习过程中的疑惑。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="类加载过程与对象的创建">
 <meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2020&#x2F;04&#x2F;04&#x2F;%E7%B1%BB%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%88%9B%E5%BB%BA&#x2F;index.html">
 <meta property="og:site_name" content="Martin&#39;s blog">
-<meta property="og:description" content="前言本篇主要用来记录JAVA类加载过程以及对象的创建过程。阐述他们之间的关系以及自己学习过程中的疑惑。 1. 类加载过程类加载过程是指jvm把通过.java文件编译生成的.class文件中的类信息加载 进内存的过程。 类加载过程可分为加载、链接和初始化。初始化又可以被细分为验证、准备和解析。    加载类加载器可分为启动类加载器（Bootstrap ClassLoader）、扩张类加载器（Exte">
+<meta property="og:description" content="前言本篇主要用来记录JAVA类加载过程以及对象的创建过程。阐述他们之间的关系以及自己学习过程中的疑惑。">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https:&#x2F;&#x2F;img01.sogoucdn.com&#x2F;app&#x2F;a&#x2F;100520146&#x2F;be56153b19501aa9560bd195e1099225">
-<meta property="og:image" content="https:&#x2F;&#x2F;img02.sogoucdn.com&#x2F;app&#x2F;a&#x2F;100520146&#x2F;2ad4a0782b36a0a1d08f1b8e98e7e676">
+<meta property="og:image" content="https:&#x2F;&#x2F;user-gold-cdn.xitu.io&#x2F;2020&#x2F;4&#x2F;21&#x2F;1719885a21481026?w&#x3D;1552&amp;h&#x3D;562&amp;f&#x3D;png&amp;s&#x3D;65259">
+<meta property="og:image" content="https:&#x2F;&#x2F;user-gold-cdn.xitu.io&#x2F;2020&#x2F;4&#x2F;21&#x2F;17198861f3c1e011?w&#x3D;971&amp;h&#x3D;487&amp;f&#x3D;png&amp;s&#x3D;49089">
 <meta property="article:published_time" content="2020-04-03T17:15:08.000Z">
-<meta property="article:modified_time" content="2020-04-04T16:20:18.611Z">
+<meta property="article:modified_time" content="2020-04-20T17:06:00.169Z">
 <meta property="article:author" content="Never say die">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https:&#x2F;&#x2F;img01.sogoucdn.com&#x2F;app&#x2F;a&#x2F;100520146&#x2F;be56153b19501aa9560bd195e1099225">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;user-gold-cdn.xitu.io&#x2F;2020&#x2F;4&#x2F;21&#x2F;1719885a21481026?w&#x3D;1552&amp;h&#x3D;562&amp;f&#x3D;png&amp;s&#x3D;65259">
   
     <link rel="alternative" href="/atom.xml" title="Martin&#39;s blog" type="application/atom+xml">
   
@@ -166,12 +166,14 @@
     <div class="article-entry" itemprop="articleBody">
       
         <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>本篇主要用来记录JAVA类加载过程以及对象的创建过程。阐述他们之间的关系以及自己学习过程中的疑惑。</p>
+ <a id="more"></a> 
+
 <h2 id="1-类加载过程"><a href="#1-类加载过程" class="headerlink" title="1. 类加载过程"></a>1. 类加载过程</h2><p>类加载过程是指jvm把通过.java文件编译生成的.class文件中的类信息加载 进内存的过程。</p>
 <p>类加载过程可分为加载、链接和初始化。初始化又可以被细分为验证、准备和解析。 </p>
-<img src="https://img01.sogoucdn.com/app/a/100520146/be56153b19501aa9560bd195e1099225" alt="类加载过程.png" title="类加载过程.png" />
+<img src="https://user-gold-cdn.xitu.io/2020/4/21/1719885a21481026?w=1552&h=562&f=png&s=65259" alt="类加载过程.png" title="类加载过程.png" />
 
 <h4 id="加载"><a href="#加载" class="headerlink" title="加载"></a>加载</h4><p>类加载器可分为<strong>启动类加载器</strong>（Bootstrap ClassLoader）、<strong>扩张类加载器</strong>（Extension ClassLoader）和<strong>应用类加载器</strong>（Application ClassLoader）。他们之间的继承关系如下图所示。</p>
-<img src="https://img02.sogoucdn.com/app/a/100520146/2ad4a0782b36a0a1d08f1b8e98e7e676" alt="类加载器继承关系及作用.png" title="类加载器继承关系及作用.png" />
+<img src="https://user-gold-cdn.xitu.io/2020/4/21/17198861f3c1e011?w=971&h=487&f=png&s=49089" alt="类加载器继承关系及作用.png" title="类加载器继承关系及作用.png" />
 
 <p>类加载器会动态的加载java类到虚拟机内存中，并且会按需加载，只有在需要时才对java类进行加载，并且每个类只会被加载一次。</p>
 <p>类加载器在加载Java类时会采用<strong>双亲委派模型</strong>：当类加载器在加载java类时，会先委派给父类加载，层层上传，最后会把加载任务委派给<strong>启动类加载器</strong>。只有父类类加载器无法完成这个加载任务时（搜索范围中没有找到对应的类），子加载器才会尝试自己去加载。 所以是一个向上传递再向下传递的过程。</p>
@@ -187,7 +189,7 @@
 <p>类变量classValue被附上默认初值0。 比如8种<strong>基本类型</strong>的初值，默认为0；<strong>引用类型</strong>的初值则为null；<strong>常量</strong>的初值即为代码中设置的值。</p>
 <h4 id="解析"><a href="#解析" class="headerlink" title="解析"></a>解析</h4><p>解析就是在常量池中寻找类、接口、字段和方法的符号引用，并且将这些符号引用替换成直接引用的过程。 </p>
 <h4 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h4><p>为所有静态变量赋代码中指定的值。类变量classValue被附上初值10。</p>
-<h2 id="2-对象创建过程"><a href="#2-对象创建过程" class="headerlink" title="2. 对象创建过程"></a>2. 对象创建过程</h2><p>（1）<strong>类加载检查检查</strong>：首先检查new指令的参数能否在常量池中定位到一个类的符号引用。这个符号引用代表的类是否已被加载、解析和初始化过。如果没有，那必须先执行相应的类加载过程。</p>
+<h2 id="2-对象创建过程"><a href="#2-对象创建过程" class="headerlink" title="2. 对象创建过程"></a>2. 对象创建过程</h2><p>（1）<strong>类加载检查</strong>：首先检查new指令的参数能否在常量池中定位到一个类的符号引用。这个符号引用代表的类是否已被加载、解析和初始化过。如果没有，那必须先执行相应的类加载过程。</p>
 <p>（2）<strong>分配内存</strong>：虚拟机为新生的对象分配内存，对象所需的内存大小在类加载完成后便可完全确定。</p>
 <p>（3）<strong>初始化</strong>：内存分配完成后，虚拟机会把分配到的内存空间都初始化为零值（不包括对象头），保证了对象实例字段在Java代码中可以不赋初值就可以直接使用。</p>
 <p>（4）<strong>设置对象头</strong>：虚拟机要对对象进行必要的设置，例如这个对象是哪个类的实例、如何才能找到类的元数据信息、对象的哈希码、对象的GC分代年龄等信息。这些信息存放在对象的对象头中。</p>

@@ -8,20 +8,21 @@
   <link rel="dns-prefetch" href="http://yoursite.com">
   <title>volatile解析 | Martin&#39;s blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="前言volatile变量是Java提供的一种削弱的同步机制，用来确保将变量的更新操作通知到其他线程。我将在这两博客中分享自己对volatile变量的理解。 volatile特点 保证被修饰变量的不会被重排序 保证被修饰变量可见性  什么是重排序重排序是指当操作之间不存在依赖关系（Happens-Before关系）时，编译器在不改变单线程程序最终执行结果的前提下，对指令进行重排序以达到提高执行效率的">
+  <meta name="description" content="前言volatile变量是Java提供的一种削弱的同步机制，用来确保将变量的更新操作通知到其他线程。我将在这篇博客中分享自己对volatile变量的理解。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="volatile解析">
 <meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2020&#x2F;04&#x2F;10&#x2F;volatile%E8%A7%A3%E6%9E%90&#x2F;index.html">
 <meta property="og:site_name" content="Martin&#39;s blog">
-<meta property="og:description" content="前言volatile变量是Java提供的一种削弱的同步机制，用来确保将变量的更新操作通知到其他线程。我将在这两博客中分享自己对volatile变量的理解。 volatile特点 保证被修饰变量的不会被重排序 保证被修饰变量可见性  什么是重排序重排序是指当操作之间不存在依赖关系（Happens-Before关系）时，编译器在不改变单线程程序最终执行结果的前提下，对指令进行重排序以达到提高执行效率的">
+<meta property="og:description" content="前言volatile变量是Java提供的一种削弱的同步机制，用来确保将变量的更新操作通知到其他线程。我将在这篇博客中分享自己对volatile变量的理解。">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https:&#x2F;&#x2F;img02.sogoucdn.com&#x2F;app&#x2F;a&#x2F;100520146&#x2F;a80d40cfdceef9cb28701d3e216fd5f0">
-<meta property="og:image" content="https:&#x2F;&#x2F;img04.sogoucdn.com&#x2F;app&#x2F;a&#x2F;100520146&#x2F;a126a7ed5f4cf3ee7e65ea69044b9058">
+<meta property="og:image" content="https:&#x2F;&#x2F;user-gold-cdn.xitu.io&#x2F;2020&#x2F;4&#x2F;20&#x2F;171935a885696d45?w&#x3D;2799&amp;h&#x3D;1212&amp;f&#x3D;png&amp;s&#x3D;101534">
+<meta property="og:image" content="https:&#x2F;&#x2F;user-gold-cdn.xitu.io&#x2F;2020&#x2F;4&#x2F;20&#x2F;171936132e57a68b?w&#x3D;2799&amp;h&#x3D;1212&amp;f&#x3D;png&amp;s&#x3D;109545">
+<meta property="og:image" content="https:&#x2F;&#x2F;user-gold-cdn.xitu.io&#x2F;2020&#x2F;4&#x2F;20&#x2F;17193631fb5e4fb7?w&#x3D;2799&amp;h&#x3D;1212&amp;f&#x3D;png&amp;s&#x3D;108049">
 <meta property="article:published_time" content="2020-04-09T16:51:30.000Z">
-<meta property="article:modified_time" content="2020-04-17T18:20:17.767Z">
+<meta property="article:modified_time" content="2020-04-20T17:46:52.729Z">
 <meta property="article:author" content="Never say die">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https:&#x2F;&#x2F;img02.sogoucdn.com&#x2F;app&#x2F;a&#x2F;100520146&#x2F;a80d40cfdceef9cb28701d3e216fd5f0">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;user-gold-cdn.xitu.io&#x2F;2020&#x2F;4&#x2F;20&#x2F;171935a885696d45?w&#x3D;2799&amp;h&#x3D;1212&amp;f&#x3D;png&amp;s&#x3D;101534">
   
     <link rel="alternative" href="/atom.xml" title="Martin&#39;s blog" type="application/atom+xml">
   
@@ -165,29 +166,32 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>volatile变量是Java提供的一种削弱的同步机制，用来确保将变量的更新操作通知到其他线程。我将在这两博客中分享自己对volatile变量的理解。</p>
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>volatile变量是Java提供的一种削弱的同步机制，用来确保将变量的更新操作通知到其他线程。我将在这篇博客中分享自己对volatile变量的理解。</p>
+ <a id="more"></a> 
+
 <h4 id="volatile特点"><a href="#volatile特点" class="headerlink" title="volatile特点"></a>volatile特点</h4><ul>
-<li>保证被修饰变量的不会被重排序</li>
+<li>保证被修饰的变量不会被重排序</li>
 <li>保证被修饰变量可见性</li>
 </ul>
 <h4 id="什么是重排序"><a href="#什么是重排序" class="headerlink" title="什么是重排序"></a>什么是重排序</h4><p>重排序是指当操作之间不存在依赖关系（Happens-Before关系）时，编译器在不改变单线程程序最终执行结果的前提下，对指令进行重排序以达到提高执行效率的目的。如下面代码中所示：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> a = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">int</span> b = <span class="number">2</span>;</span><br><span class="line"><span class="keyword">int</span> c = a + b</span><br></pre></td></tr></table></figure>
 
 <p>代码中a=0和b=2之间不存在依赖关系（Happens-Before关系），即他们的执行顺序不会影响最终的执行结果，所以b=2可能会被排序到a=0之前执行。但是a=0和b=2不会被重排序到c=a+b之后执行，因为他们之间存在依赖关系（Happens-Before关系）。</p>
-<h4 id="为什么要防止重排序"><a href="#为什么要防止重排序" class="headerlink" title="为什么要防止重排序"></a>为什么要防止重排序</h4><p>在单线程情况下，重排序可以给程序带来更高的执行效率。但是在多线程情况下重排序就会带来不可预测的问题。如下面代码所示。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h4 id="为什么要防止重排序"><a href="#为什么要防止重排序" class="headerlink" title="为什么要防止重排序"></a>为什么要防止重排序</h4><p>在单线程情况下，重排序可以给程序带来更高的执行效率。但是在有些情况下重排序就会带来不可预测的问题。如下面代码所示。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PossibleReordering</span></span>&#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> num = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">boolean</span> flag = <span class="keyword">false</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException</span>&#123;</span><br><span class="line">        Threadd one = <span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable()&#123;</span><br><span class="line">           <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>&#123;</span><br><span class="line">               <span class="keyword">while</span>(!flag)&#123;</span><br><span class="line">               &#125;</span><br><span class="line">               System.out.println(num);</span><br><span class="line">           &#125; </span><br><span class="line">        &#125;);</span><br><span class="line">        </span><br><span class="line">        one.start();</span><br><span class="line">        num = <span class="number">44</span>;    \\ 语句<span class="number">1</span></span><br><span class="line">        flag = <span class="keyword">true</span>; \\ 语句<span class="number">2</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-
-
+<p>在没有重排序的情况下会正常输出44，但如果语句1和语句2交换了顺序，则输出0。因此重排序在某些情况下会导致线程安全问题。</p>
 <h4 id="可见性问题"><a href="#可见性问题" class="headerlink" title="可见性问题"></a>可见性问题</h4><p>在多线程的情况下回导致可见性问题，如下图所示，线程A和线程B都拥有各自的工作内存，工作内存是线程私有的，即对其他线程不可见。主存中存在一个共享变量a=0，且线程A和线程B的工作内存中都保存了共享变量a=0的副本。如果共享变量并没有被volatile变量修饰，那么线程A或线程B对于工作内存中共享变量a的副本的修改可能不会马上刷新到主存中，也就是说线程A的工作内存中的副本a可能已经被修改成了5，但这些变化对于线程B并不可见。</p>
-<img src="https://img02.sogoucdn.com/app/a/100520146/a80d40cfdceef9cb28701d3e216fd5f0" alt="可见性问题.png" title="可见性问题.png" />
+<img src="https://user-gold-cdn.xitu.io/2020/4/20/171935a885696d45?w=2799&h=1212&f=png&s=101534" alt="可见性问题.png" title="可见性问题.png" />
 
 <p>如下图所示，如果共享变量a是volatile变量，则线程A对于副本的修改会立即刷新到主存中并通知其他线程，被volatile修饰的变量可以保证对于变量的写操作位于读操作之前。</p>
-<img src="https://img04.sogoucdn.com/app/a/100520146/a126a7ed5f4cf3ee7e65ea69044b9058" alt="可见性.png" title="可见性.png" /> 
+<img src="https://user-gold-cdn.xitu.io/2020/4/20/171936132e57a68b?w=2799&h=1212&f=png&s=109545" alt="可见性.png" title="可见性.png" />
 
 
 
 <h4 id="volatile解决不了原子性问题"><a href="#volatile解决不了原子性问题" class="headerlink" title="volatile解决不了原子性问题"></a>volatile解决不了原子性问题</h4><p>当线程A和线程B同时要对主存中的共享变量a进行加1操作时，会首先将共享变量a读取到自己的工作内存中，即此时线程A和线程B的工作内存中都存储了共享变量a=0的副本。然后线程A和线程B分别对各自工作内存中a变量的副本进行加1操作，然后写回主存中，主存中a变量的最终结果是1，但a实际上被进行了两次加一操作。</p>
+<img src="https://user-gold-cdn.xitu.io/2020/4/20/17193631fb5e4fb7?w=2799&h=1212&f=png&s=108049" alt="原则操作问题.png" title="原则操作问题.png" />
+
 
       
 
