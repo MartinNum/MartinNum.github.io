@@ -11,7 +11,7 @@
   <meta name="description" content="前言HNSW用于近似最近邻搜索，下面将首先讲解HSNW的构建原理，为了方便读者阅读HNSW源码，避免被HNSW繁杂的参数弄的晕头转向，我还附上了HSNW索引的内存模型图，图中的参数对应HNSW源码中的参数，读者可以不理解参数所代表的意思时对着索引内存模型图。结尾附上了带中文注释的源码地址。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="HNSW原理">
-<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;12&#x2F;16&#x2F;HNSW%E5%8E%9F%E7%90%86&#x2F;index.html">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;06&#x2F;16&#x2F;HNSW%E5%8E%9F%E7%90%86&#x2F;index.html">
 <meta property="og:site_name" content="Martin&#39;s blog">
 <meta property="og:description" content="前言HNSW用于近似最近邻搜索，下面将首先讲解HSNW的构建原理，为了方便读者阅读HNSW源码，避免被HNSW繁杂的参数弄的晕头转向，我还附上了HSNW索引的内存模型图，图中的参数对应HNSW源码中的参数，读者可以不理解参数所代表的意思时对着索引内存模型图。结尾附上了带中文注释的源码地址。">
 <meta property="og:locale" content="en_US">
@@ -20,8 +20,8 @@
 <meta property="og:image" content="https:&#x2F;&#x2F;i.loli.net&#x2F;2019&#x2F;12&#x2F;16&#x2F;Jw5n68WFMPKctV7.png">
 <meta property="og:image" content="https:&#x2F;&#x2F;i.loli.net&#x2F;2019&#x2F;12&#x2F;16&#x2F;DvZA7QgMJ5N4USh.png">
 <meta property="og:image" content="https:&#x2F;&#x2F;i.loli.net&#x2F;2019&#x2F;12&#x2F;16&#x2F;Y8BFC3HUhlEDckb.png">
-<meta property="article:published_time" content="2019-12-16T09:46:25.000Z">
-<meta property="article:modified_time" content="2020-04-02T15:59:28.398Z">
+<meta property="article:published_time" content="2019-06-16T09:46:25.000Z">
+<meta property="article:modified_time" content="2020-04-22T13:15:25.100Z">
 <meta property="article:author" content="Never say die">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https:&#x2F;&#x2F;i.loli.net&#x2F;2019&#x2F;12&#x2F;16&#x2F;kezlnC9Hiw3ROPr.png">
@@ -160,8 +160,8 @@
   
 
         
-        <a href="/2019/12/16/HNSW%E5%8E%9F%E7%90%86/" class="archive-article-date">
-  	<time datetime="2019-12-16T09:46:25.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-12-16</time>
+        <a href="/2019/06/16/HNSW%E5%8E%9F%E7%90%86/" class="archive-article-date">
+  	<time datetime="2019-06-16T09:46:25.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-06-16</time>
 </a>
         
       </header>
@@ -264,7 +264,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/12/16/HNSW%E5%8E%9F%E7%90%86/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/06/16/HNSW%E5%8E%9F%E7%90%86/" alt="微信分享二维码">
     </div>
 </div>
 
