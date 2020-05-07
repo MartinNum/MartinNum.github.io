@@ -16,7 +16,7 @@
 <meta property="og:description" content="前言锁优化措施包括：锁消除和锁粗化。他们都是针对不同情况下的低效锁操作进行的优化，其中锁消除过程和逃逸分析密切相关。">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2020-04-22T13:14:30.000Z">
-<meta property="article:modified_time" content="2020-04-23T04:55:32.724Z">
+<meta property="article:modified_time" content="2020-04-23T06:50:32.185Z">
 <meta property="article:author" content="Never say die">
 <meta name="twitter:card" content="summary">
   
@@ -185,7 +185,7 @@
 <p>java中对象都是分配在堆内存中，但如果通过逃逸分析得到某个对象没有发生逃逸，即只有单个线程能够访问，该对象可能会被分配到栈上，这样对象就会随着线程的退出而被回收，同时也可以减小垃圾回收的压力。</p>
 </li>
 </ol>
-<h3 id="锁粗化"><a href="#锁粗化" class="headerlink" title="锁粗化"></a>锁粗化</h3><p>锁解除对应着粗话，如下面代码所示：</p>
+<h3 id="锁粗化"><a href="#锁粗化" class="headerlink" title="锁粗化"></a>锁粗化</h3><p>锁解除对应着锁粗化，如下面代码所示：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> StringBuffer <span class="title">escape</span><span class="params">()</span></span>&#123;</span><br><span class="line">        StringBuffer outside = <span class="keyword">new</span> StringBuffer();</span><br><span class="line">        outside.append(<span class="string">"发生逃逸1"</span>);</span><br><span class="line">        outside.append(<span class="string">"发生逃逸2"</span>);</span><br><span class="line">        outside.append(<span class="string">"发生逃逸3"</span>);</span><br><span class="line">        <span class="keyword">return</span> outside;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
 <p>StringBuffer是同步类，因此在append()方法添加字符串时需要同步机制，但是每次使用append方法都需要获取锁，退出后释放锁。这样频繁的获取锁和释放锁的操作会引起性能的损失。 如果虚拟机探测到有一串零碎操作都是对同一对象加锁，将会把加锁的范围扩展到整个操作序列的外部，也就是上面示例中将三个append()操作包含到一次加锁操作中。</p>
