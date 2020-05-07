@@ -16,7 +16,7 @@
 <meta property="og:description" content="实时监控日志文件tail -f ***.log 查看文件前10行head -n 10 *** 查看文件行数wc -l *** 查看当前目录路径pwd">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2020-01-08T10:55:03.000Z">
-<meta property="article:modified_time" content="2020-05-07T06:54:53.784Z">
+<meta property="article:modified_time" content="2020-05-07T11:33:49.290Z">
 <meta property="article:author" content="Never say die">
 <meta name="twitter:card" content="summary">
   
@@ -171,9 +171,11 @@
 <h6 id="查看磁盘使用情况"><a href="#查看磁盘使用情况" class="headerlink" title="查看磁盘使用情况"></a>查看磁盘使用情况</h6><p>df -h</p>
 <h6 id="创建文件夹"><a href="#创建文件夹" class="headerlink" title="创建文件夹"></a>创建文件夹</h6><p>mkdir ***</p>
 <h6 id="将程序jobs-py后台运行，并将输出信息输入到jobs-log中"><a href="#将程序jobs-py后台运行，并将输出信息输入到jobs-log中" class="headerlink" title="将程序jobs.py后台运行，并将输出信息输入到jobs.log中"></a>将程序jobs.py后台运行，并将输出信息输入到jobs.log中</h6><p>nohup python -u jobs.py &gt; jobs.log 2&gt;&amp;1 &amp;</p>
-<p>解析：nohup(no hang up)-不挂断，一般形式为nohup command &amp;, &amp;表示后台运行，在不指定日志输出文件的情况下默认输出到当前目录下的nohup.out文件中，需要重新指定输出文件是使用 &gt; 指定文件所在路径。 2&gt;&amp;1中2表示 stderr (standard error) 标准错误信息，1表示stdout (standard output) 标准输出，即将错误信息输出到标准信息中，标准信息又是输出到指定的文件中，即将错误信息和标准信息输出到指定的文件中。</p>
+<p><strong>解析</strong>：nohup(no hang up)-不挂断，一般形式为nohup command &amp;, &amp;表示后台运行，在不指定日志输出文件的情况下默认输出到当前目录下的nohup.out文件中，需要重新指定输出文件是使用 &gt; 指定文件所在路径。 2&gt;&amp;1中2表示 stderr (standard error) 标准错误信息，1表示stdout (standard output) 标准输出，即将错误信息输出到标准信息中，标准信息又是输出到指定的文件中，即将错误信息和标准信息输出到指定的文件中。</p>
 <h6 id="打通道命令"><a href="#打通道命令" class="headerlink" title="打通道命令"></a>打通道命令</h6><p>ssh -f -N -L 1234:202.107.204.49:22 <a href="mailto:root@202.107.204.57">root@202.107.204.57</a> -p 20002</p>
 <h6 id="查看线程"><a href="#查看线程" class="headerlink" title="查看线程"></a>查看线程</h6><p>ps -T</p>
+<p>查看所有线程 </p>
+<p>top</p>
 <h6 id="关闭线程"><a href="#关闭线程" class="headerlink" title="关闭线程"></a>关闭线程</h6><p>kill [线程 id]</p>
 <h6 id="查看内存"><a href="#查看内存" class="headerlink" title="查看内存"></a>查看内存</h6><p>free -m</p>
 
