@@ -8,15 +8,19 @@
   <link rel="dns-prefetch" href="http://yoursite.com">
   <title>使用Texstudio时遇到的问题 | Martin&#39;s blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="article">
+  <meta name="description" content="前言在使用Texstudio遇到的防修改机制。">
+<meta property="og:type" content="article">
 <meta property="og:title" content="使用Texstudio时遇到的问题">
 <meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2020&#x2F;04&#x2F;07&#x2F;%E4%BD%BF%E7%94%A8Texstudio%E6%97%B6%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98&#x2F;index.html">
 <meta property="og:site_name" content="Martin&#39;s blog">
+<meta property="og:description" content="前言在使用Texstudio遇到的防修改机制。">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="https:&#x2F;&#x2F;user-gold-cdn.xitu.io&#x2F;2020&#x2F;5&#x2F;8&#x2F;171f24c24da95a4b?w&#x3D;742&amp;h&#x3D;79&amp;f&#x3D;png&amp;s&#x3D;6897">
 <meta property="article:published_time" content="2020-04-07T05:49:45.000Z">
-<meta property="article:modified_time" content="2020-04-07T05:49:45.263Z">
+<meta property="article:modified_time" content="2020-05-08T03:29:12.045Z">
 <meta property="article:author" content="Never say die">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;user-gold-cdn.xitu.io&#x2F;2020&#x2F;5&#x2F;8&#x2F;171f24c24da95a4b?w&#x3D;742&amp;h&#x3D;79&amp;f&#x3D;png&amp;s&#x3D;6897">
   
     <link rel="alternative" href="/atom.xml" title="Martin&#39;s blog" type="application/atom+xml">
   
@@ -160,7 +164,20 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在使用Texstudio遇到的防修改机制。</p>
+ <a id="more"></a> 
+
+<p>在使用Texstudio编辑论文的时候，下载了别人的.tex格式作为模板，在编写的过程中出现以下的问题：</p>
+<ul>
+<li>修改的内容无法保存。</li>
+<li>修改后无法运行。</li>
+<li>点击错误提示后会在新的编辑页面显示错误出现的位置，修改后同样无法保存和运行。</li>
+<li>无法正常导入图片，引用。</li>
+</ul>
+<p>刚开始通过另存为的方式保存和运行还可以勉强进行修改，直到发现无法正常导入图片时问题才变的严重，因为语法并没有错误，图片路径也没有问题。因为同样的语法在别的项目上可以正常导入图片，于是就思考模板中是不是有什么保护机制用于防止修改。在找了很久之后终于发现了这段代码%!TEX root = ./sample-sigconf-authordraft.tex，在错误排查的时候很难注意到一段看似被注释的代码上并且所有的错误提示也都不会指向这段代码，只要把这段代码注释掉，以上问题就不再存在。</p>
+<img src="https://user-gold-cdn.xitu.io/2020/5/8/171f24c24da95a4b?w=742&h=79&f=png&s=6897" alt="微信图片_20200508111946.png" title="微信图片_20200508111946.png" />
+
+
       
 
       
@@ -270,7 +287,7 @@
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    目录，不存在的…
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li></ol>
                     </div>
                 </span>
             </div>

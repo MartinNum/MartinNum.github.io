@@ -6,23 +6,19 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>JVM学习笔记（第二章） | Martin&#39;s blog</title>
+  <title>InnoDB之事务隔离级别 | Martin&#39;s blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="前言对JVM第二章的知识点进行总结，同时方便自己以后的回顾。">
+  <meta name="description" content="前言在和同学讨论幻读问题的时候，他们都认为在REPEATABLE READ隔离级别下可能会产生幻读问题，于是在网上查询相关资料也说会产生幻读问题。在这篇文章中我会介绍四种事务隔离级别，并通过结合书中的内容阐述自己对于幻读问题的理解以及自己对于REPEATABLE READ隔离级别下是否会产生幻读问题的理解。（MySQL官方文档中将不可重复读定义为幻读&lt;Phantom Problem&gt;）">
 <meta property="og:type" content="article">
-<meta property="og:title" content="JVM学习笔记（第二章）">
-<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;12&#x2F;17&#x2F;JVM%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E7%AC%AC%E4%BA%8C%E7%AB%A0%EF%BC%89&#x2F;index.html">
+<meta property="og:title" content="InnoDB之事务隔离级别">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2020&#x2F;05&#x2F;09&#x2F;InnoDB%E4%B9%8B%E4%BA%8B%E5%8A%A1%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB&#x2F;index.html">
 <meta property="og:site_name" content="Martin&#39;s blog">
-<meta property="og:description" content="前言对JVM第二章的知识点进行总结，同时方便自己以后的回顾。">
+<meta property="og:description" content="前言在和同学讨论幻读问题的时候，他们都认为在REPEATABLE READ隔离级别下可能会产生幻读问题，于是在网上查询相关资料也说会产生幻读问题。在这篇文章中我会介绍四种事务隔离级别，并通过结合书中的内容阐述自己对于幻读问题的理解以及自己对于REPEATABLE READ隔离级别下是否会产生幻读问题的理解。（MySQL官方文档中将不可重复读定义为幻读&lt;Phantom Problem&gt;）">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https:&#x2F;&#x2F;i.loli.net&#x2F;2019&#x2F;12&#x2F;17&#x2F;Qoe4VWywYjL6hrO.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;i.loli.net&#x2F;2019&#x2F;12&#x2F;17&#x2F;KV5uBo7rL1xm2Js.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;i.loli.net&#x2F;2019&#x2F;12&#x2F;17&#x2F;gdGn1KqTZShEJX8.png">
-<meta property="article:published_time" content="2019-12-17T02:14:52.000Z">
-<meta property="article:modified_time" content="2020-05-07T16:22:26.810Z">
+<meta property="article:published_time" content="2020-05-09T15:06:34.000Z">
+<meta property="article:modified_time" content="2020-05-09T15:52:31.342Z">
 <meta property="article:author" content="Never say die">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https:&#x2F;&#x2F;i.loli.net&#x2F;2019&#x2F;12&#x2F;17&#x2F;Qoe4VWywYjL6hrO.png">
   
     <link rel="alternative" href="/atom.xml" title="Martin&#39;s blog" type="application/atom+xml">
   
@@ -146,74 +142,41 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-JVM学习笔记（第二章）" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-InnoDB之事务隔离级别" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      JVM学习笔记（第二章）
+      InnoDB之事务隔离级别
     </h1>
   
 
         
-        <a href="/2019/12/17/JVM%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E7%AC%AC%E4%BA%8C%E7%AB%A0%EF%BC%89/" class="archive-article-date">
-  	<time datetime="2019-12-17T02:14:52.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-12-17</time>
+        <a href="/2020/05/09/InnoDB%E4%B9%8B%E4%BA%8B%E5%8A%A1%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB/" class="archive-article-date">
+  	<time datetime="2020-05-09T15:06:34.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-05-09</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>对JVM第二章的知识点进行总结，同时方便自己以后的回顾。</p>
- <a id="more"></a> 
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在和同学讨论幻读问题的时候，他们都认为在REPEATABLE READ隔离级别下可能会产生幻读问题，于是在网上查询相关资料也说会产生幻读问题。在这篇文章中我会介绍四种事务隔离级别，并通过结合书中的内容阐述自己对于幻读问题的理解以及自己对于REPEATABLE READ隔离级别下是否会产生幻读问题的理解。（MySQL官方文档中将不可重复读定义为幻读&lt;Phantom Problem&gt;）</p>
+<a id="more"></a>
 
-<h3 id="Java虚拟机的多线程"><a href="#Java虚拟机的多线程" class="headerlink" title="Java虚拟机的多线程"></a>Java虚拟机的多线程</h3><p>通过线程轮流切换并分配处理器执行时间的方式实现</p>
-<h3 id="程序计数器"><a href="#程序计数器" class="headerlink" title="程序计数器"></a>程序计数器</h3><p>如果执行的是Java方法，计器记录的是正在执行的虚拟机字节码指令的地址，字节码解释器通过改变计数器的值来选取下一条需要执行的字节码指令，分支、循环、跳转、异常处理、线程恢复等基本功能都需要依赖这个计数器来完成。</p>
-<h6 id="线程私有"><a href="#线程私有" class="headerlink" title="线程私有"></a>线程私有</h6><p>各个线程之间计数器互不影响，独立存储。</p>
-<h6 id="OutOfMemoryError：无，唯一"><a href="#OutOfMemoryError：无，唯一" class="headerlink" title="OutOfMemoryError：无，唯一"></a>OutOfMemoryError：无，唯一</h6><h3 id="Java虚拟机栈"><a href="#Java虚拟机栈" class="headerlink" title="Java虚拟机栈"></a>Java虚拟机栈</h3><p>生命周期和线程相同，描述的是Java方法执行的内存模型：每个方法在执行的同时都会创建一个栈帧用于存储局部变量表、操作数栈、动态链接、方法出口等信息。</p>
-<h6 id="线程私有-1"><a href="#线程私有-1" class="headerlink" title="线程私有"></a>线程私有</h6><h6 id="局部变量表"><a href="#局部变量表" class="headerlink" title="局部变量表"></a>局部变量表</h6><p>存放编译期复制的各种基本数据类型（boolean、byte、char、short、int、float、long&lt;2&gt;、double&lt;2&gt;）、对象引用（可能是一个指向对象起始地址的引用指针，也可能是指向一个代表对象的句柄或其他与此对象相关的位置）、returnAdress类型（指向一条字节码指令的地址）</p>
-<h6 id="StackOverflowError"><a href="#StackOverflowError" class="headerlink" title="StackOverflowError"></a>StackOverflowError</h6><p>当线程请求的栈深度大于虚拟机所允许的深度。</p>
-<h6 id="OutOfMemoryError"><a href="#OutOfMemoryError" class="headerlink" title="OutOfMemoryError"></a>OutOfMemoryError</h6><p>如果虚拟机可以动态扩展。当扩展时无法申请到足够的内存。</p>
-<h3 id="本地方法栈"><a href="#本地方法栈" class="headerlink" title="本地方法栈"></a>本地方法栈</h3><p>与虚拟机栈的作用非常相似，不同在于虚拟机栈为Java服务，本地方法栈为Native方法服务。</p>
-<h3 id="Java堆"><a href="#Java堆" class="headerlink" title="Java堆"></a>Java堆</h3><p>在虚拟机启动时创建，所有对象实例以及数组都要在堆上分配（但随着JIT编译器和逃逸分析技术的成熟，所有对象都要在分配在堆上变得不那么绝对），是垃圾收集器管理的主要区域</p>
-<h6 id="线程共享"><a href="#线程共享" class="headerlink" title="线程共享"></a>线程共享</h6><h6 id="OutOfMemoryError-1"><a href="#OutOfMemoryError-1" class="headerlink" title="OutOfMemoryError"></a>OutOfMemoryError</h6><p>当堆中没有内存完成实例分配，并且堆也无法再扩展时。</p>
-<h3 id="方法区"><a href="#方法区" class="headerlink" title="方法区"></a>方法区</h3><p>用于存储已被虚拟机加载的类信息、常量、静态变量、即时编译器编译后的代码等数据。</p>
-<p>注意点：HotSpt虚拟机把GC分代收集扩展至方法区，即是用永久代来实现方法区，对于其他的虚拟机来说不存在永久代的概念。</p>
-<p>特点：除了和Java堆一样不需要连续的内存空间和可以选择固定大小或可扩展外，还可以选择不实现垃圾收集。相对而言，垃圾收集行为在这个区域比较少出现，这区域的内存回收目标主要是针对常量池的回收和对类型的卸载，但是垃圾收集的效果不好，尤其是类型卸载。</p>
-<h6 id="OutOfMemoryError-2"><a href="#OutOfMemoryError-2" class="headerlink" title="OutOfMemoryError"></a>OutOfMemoryError</h6><p>当方法区无法满足内存分配需求时。</p>
-<h6 id="线程共享-1"><a href="#线程共享-1" class="headerlink" title="线程共享"></a>线程共享</h6><h3 id="运行时常量池"><a href="#运行时常量池" class="headerlink" title="运行时常量池"></a>运行时常量池</h3><p>是方法区的一部分，用于存放Class文件中的常量池在编译期生成的各种字面量和符号引用。</p>
-<p>特点：运行时常量池具有动态性，并不是预置入Class文件中常量池的内容才能进入方法区的运行时常量池，运行期间也可能将新的常量放入池中，比如String类的intern()方法。</p>
-<p>注意点：JDK1.7之前，String的intern()方法会把首次遇到的字符串实例复制到永久代中（方法区称为永久代，方法区的运行时常量池），返回的也是永久代中这个字符串实例的引用，如果不是该字符串不是首次出现，则直接返回已存在字符串实例的引用。JDK1.7之后，String的intern()方法不会在复制首次遇到的实例，而是在常量池中记录首次出现的实例引用，如果不是该字符串不是首次出现，则直接返回已存在字符串实例的引用。</p>
-<h6 id="OutOfMemoryError-3"><a href="#OutOfMemoryError-3" class="headerlink" title="OutOfMemoryError"></a>OutOfMemoryError</h6><p>当常量池无法再申请到内存时。</p>
-<h3 id="直接内存"><a href="#直接内存" class="headerlink" title="直接内存"></a>直接内存</h3><p>使用Native函数库直接分配堆外内存，然后通过存储在Java堆中的DirectByteBuffer对象作为这块内存的引用进行操作。</p>
-<p>注意点：直接内存更适合在内存申请次数较少，但读写操作较频繁的场景。</p>
-<h6 id="OutOfMemoryError-4"><a href="#OutOfMemoryError-4" class="headerlink" title="OutOfMemoryError"></a>OutOfMemoryError</h6><h3 id="对象的创建"><a href="#对象的创建" class="headerlink" title="对象的创建"></a>对象的创建</h3><p>(1) 首先检查new指令的参数能否在常量池中定位到一个类的符号引用。</p>
-<p>(2) 检查这个符号引用代表的类是否已被加载、解析和初始化过。如果没有，那必须先执行相应的类加载过程。</p>
-<p>(3) 虚拟机为新生的对象分配内存，对象所需的内存大小在类加载完成后便可完全确定。</p>
-<p>(4) 内存分配完成后，虚拟机会把分配到的内存空间都初始化为零值（不包括对象头），保证了对象实例字段在Java代码中可以不赋初值就可以直接使用。</p>
-<p>(5) 虚拟机要对对象进行必要的设置，例如这个对象是哪个类的实例、如何才能找到类的元数据信息、对象的哈希码、对象的GC分代年龄等信息。这些信息存放在对象的对象头中。</p>
-<p>(6) 执行&lt;init&gt;方法，把对象按照程序员的意愿进行初始化。</p>
-<h6 id="堆内存分配规则"><a href="#堆内存分配规则" class="headerlink" title="堆内存分配规则"></a>堆内存分配规则</h6><p>指针碰撞–假设java堆中的内存是绝对规整的，所有用过的内存放在一边，空闲的内存放在另一边，使用指针作为分界点的指示器。那么在分配内存时，只需要指针向空闲空间的方向移动对象大小相等的距离即可。</p>
-<p>空闲列表–如果java堆的内存并不是规整的，虚拟机需要维护一个列表，记录上哪些内存块是可用的，在分配内存时从列表中找到一块足够大的空间划分给对象实例，并更新列表上的记录。</p>
-<h6 id="并发"><a href="#并发" class="headerlink" title="并发"></a>并发</h6><p>(1) 对分配内存空间的动作进行同步处理——实际上虚拟机采用CAS配上失败重试的方式保证更新操作的原子性。</p>
-<p>(2) 把内存分配的动作按照线程划分在不同的空间之中进行，即每个线程在Java堆中预先分配一小块内存，称为本地线程分配缓冲（Thread Local Allocation Buffer，TLAB）。那个线程要分配内存，就在哪个线程的TLAB上分配，只有TLAB用完并分配新的TLAB是，才需要同步锁定。</p>
-<h3 id="对象的内存布局"><a href="#对象的内存布局" class="headerlink" title="对象的内存布局"></a>对象的内存布局</h3><h6 id="对象头"><a href="#对象头" class="headerlink" title="对象头"></a>对象头</h6><p>第一部分：用于存储对象自身的运行时数据，如哈希码（HashCode）、GC分代年龄、锁状态标记、线程持有的锁、偏向线程ID、偏向时间戳等，这部分数据的长度在32位和64位的虚拟机上中分别为32bit和64bit，官方称它为“Mark Word”。Mark Word是非固定的数据结构，它会根据自己的状态复用自己的存储空间。</p>
-<img src="https://i.loli.net/2019/12/17/Qoe4VWywYjL6hrO.png" alt="对象头.png" title="对象头.png" />
-
-<p>第二部分：类型指针，即对象指向它的类元数据的指针，虚拟机通过这个指针来确定这个对象是哪个类的实例。另外，如果对象是一个Java数组，那在对象头中还必须包括一块用于记录数组长度的数据，因为虚拟机可以通过普通Java对象的元数据信息确定Java对象的大小，但是无法通过数组的元数据确定数组的大小。</p>
-<p>注意：并不是所有的虚拟机实现都必须在对象数据上保留类型指针，换句话说，查找对象的元数据信息并不一定要经过对象本身。&lt;2.3.3&gt;</p>
-<h6 id="实例数据"><a href="#实例数据" class="headerlink" title="实例数据"></a>实例数据</h6><p>存储程序代码中所定义的各种类型的字段内容。无论是从父类继承下来的，还是在子类中定义的，都会被记录起来。</p>
-<h6 id="对齐填充"><a href="#对齐填充" class="headerlink" title="对齐填充"></a>对齐填充</h6><p>对齐填充并不是必然存在的，也没有特变的含义，仅仅起到占位符的作用。由于HotSpot VM的自动内存管理系统要求对象的起始地址必须是8个字节的倍数，所以对象所占的内存如果不是8个字节的倍数，就需要通过对齐填充来补全。</p>
-<h3 id="对象的访问定位"><a href="#对象的访问定位" class="headerlink" title="对象的访问定位"></a>对象的访问定位</h3><h6 id="使用句柄"><a href="#使用句柄" class="headerlink" title="使用句柄"></a>使用句柄</h6><p>在Java堆中划分出一块内存作为句柄池，reference中的存储的就是对象的句柄地址，而句柄中包含了对象实例数据与类型数据各自的具体地址信息。</p>
-<img src="https://i.loli.net/2019/12/17/KV5uBo7rL1xm2Js.png" alt="句柄访问.png" title="句柄访问.png" />
-
-<p>优势：reference中存储的是稳定的句柄地址，在对象被移动时只会改变句柄池的实例数据指针。</p>
-<h6 id="直接指针访问"><a href="#直接指针访问" class="headerlink" title="直接指针访问"></a>直接指针访问</h6><p>reference中存储对象的地址</p>
-<img src="https://i.loli.net/2019/12/17/gdGn1KqTZShEJX8.png" alt="直接指针访问.png" title="直接指针访问.png" />
-
-<p>优势：速度更快，节省了一次指针定位的时间开销。·</p>
+<h3 id="事务的特点（ACID）"><a href="#事务的特点（ACID）" class="headerlink" title="事务的特点（ACID）"></a>事务的特点（ACID）</h3><ul>
+<li>原子性（atomicity）</li>
+<li>一致性（consistency）</li>
+<li>隔离性（isolation）</li>
+<li>持久性（durability）</li>
+</ul>
+<p>InnoBD存储引擎通过redo log（重做日志）实现事务的原子性和持久性，通过undo log实现事务的一致性，通过锁实现事务的隔离性。这里重点介绍不同的锁实现与对应的隔离级别对于事务的影响。</p>
+<h3 id="行锁的三种实现"><a href="#行锁的三种实现" class="headerlink" title="行锁的三种实现"></a>行锁的三种实现</h3><ul>
+<li>Record Lock: 单个行记录上的锁。</li>
+<li>Gap Lock: 间隙锁，锁定一个范围，但不包括记录本身。</li>
+<li>Next-Key Lock: Gap Lock + Record Lock,锁定一个范围，并且锁住记录本身。</li>
+</ul>
 
       
 
@@ -272,7 +235,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/12/17/JVM%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E7%AC%AC%E4%BA%8C%E7%AB%A0%EF%BC%89/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2020/05/09/InnoDB%E4%B9%8B%E4%BA%8B%E5%8A%A1%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -286,18 +249,9 @@
   
 <nav id="article-nav">
   
-    <a href="/2019/12/17/JVM%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E7%AC%AC%E4%B8%89%E7%AB%A0%EF%BC%89/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          JVM学习笔记（第三章）
-        
-      </div>
-    </a>
   
-  
-    <a href="/2019/06/16/HNSW%E5%8E%9F%E7%90%86/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">HNSW原理</div>
+    <a href="/2020/05/08/ThreadLocal%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">ThreadLocal原理解析</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -324,7 +278,7 @@
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Java虚拟机的多线程"><span class="toc-number">1.0.1.</span> <span class="toc-text">Java虚拟机的多线程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#程序计数器"><span class="toc-number">1.0.2.</span> <span class="toc-text">程序计数器</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#线程私有"><span class="toc-number">1.0.2.0.0.1.</span> <span class="toc-text">线程私有</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#OutOfMemoryError：无，唯一"><span class="toc-number">1.0.2.0.0.2.</span> <span class="toc-text">OutOfMemoryError：无，唯一</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Java虚拟机栈"><span class="toc-number">1.0.3.</span> <span class="toc-text">Java虚拟机栈</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#线程私有-1"><span class="toc-number">1.0.3.0.0.1.</span> <span class="toc-text">线程私有</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#局部变量表"><span class="toc-number">1.0.3.0.0.2.</span> <span class="toc-text">局部变量表</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#StackOverflowError"><span class="toc-number">1.0.3.0.0.3.</span> <span class="toc-text">StackOverflowError</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#OutOfMemoryError"><span class="toc-number">1.0.3.0.0.4.</span> <span class="toc-text">OutOfMemoryError</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#本地方法栈"><span class="toc-number">1.0.4.</span> <span class="toc-text">本地方法栈</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Java堆"><span class="toc-number">1.0.5.</span> <span class="toc-text">Java堆</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#线程共享"><span class="toc-number">1.0.5.0.0.1.</span> <span class="toc-text">线程共享</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#OutOfMemoryError-1"><span class="toc-number">1.0.5.0.0.2.</span> <span class="toc-text">OutOfMemoryError</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#方法区"><span class="toc-number">1.0.6.</span> <span class="toc-text">方法区</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#OutOfMemoryError-2"><span class="toc-number">1.0.6.0.0.1.</span> <span class="toc-text">OutOfMemoryError</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#线程共享-1"><span class="toc-number">1.0.6.0.0.2.</span> <span class="toc-text">线程共享</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#运行时常量池"><span class="toc-number">1.0.7.</span> <span class="toc-text">运行时常量池</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#OutOfMemoryError-3"><span class="toc-number">1.0.7.0.0.1.</span> <span class="toc-text">OutOfMemoryError</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#直接内存"><span class="toc-number">1.0.8.</span> <span class="toc-text">直接内存</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#OutOfMemoryError-4"><span class="toc-number">1.0.8.0.0.1.</span> <span class="toc-text">OutOfMemoryError</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#对象的创建"><span class="toc-number">1.0.9.</span> <span class="toc-text">对象的创建</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#堆内存分配规则"><span class="toc-number">1.0.9.0.0.1.</span> <span class="toc-text">堆内存分配规则</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#并发"><span class="toc-number">1.0.9.0.0.2.</span> <span class="toc-text">并发</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#对象的内存布局"><span class="toc-number">1.0.10.</span> <span class="toc-text">对象的内存布局</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#对象头"><span class="toc-number">1.0.10.0.0.1.</span> <span class="toc-text">对象头</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#实例数据"><span class="toc-number">1.0.10.0.0.2.</span> <span class="toc-text">实例数据</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#对齐填充"><span class="toc-number">1.0.10.0.0.3.</span> <span class="toc-text">对齐填充</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#对象的访问定位"><span class="toc-number">1.0.11.</span> <span class="toc-text">对象的访问定位</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#使用句柄"><span class="toc-number">1.0.11.0.0.1.</span> <span class="toc-text">使用句柄</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#直接指针访问"><span class="toc-number">1.0.11.0.0.2.</span> <span class="toc-text">直接指针访问</span></a></li></ol></li></ol></li></ol></li></ol></li></ol></li></ol>
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#事务的特点（ACID）"><span class="toc-number">1.1.</span> <span class="toc-text">事务的特点（ACID）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#行锁的三种实现"><span class="toc-number">1.2.</span> <span class="toc-text">行锁的三种实现</span></a></li></ol></li></ol>
                     </div>
                 </span>
             </div>
