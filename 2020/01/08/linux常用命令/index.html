@@ -8,15 +8,15 @@
   <link rel="dns-prefetch" href="http://yoursite.com">
   <title>linux常用命令 | Martin&#39;s blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="实时监控日志文件tail -f ***.log 查看文件前10行head -n 10 *** 查看文件行数wc -l *** 查看当前目录路径pwd">
+  <meta name="description" content="实时监控日志文件tail -f ***.log 查看文件前10行head -n 10 *** 解压文件tar -zxvf *** 查看文件行数wc -l *** 查看当前目录路径pwd">
 <meta property="og:type" content="article">
 <meta property="og:title" content="linux常用命令">
 <meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2020&#x2F;01&#x2F;08&#x2F;linux%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4&#x2F;index.html">
 <meta property="og:site_name" content="Martin&#39;s blog">
-<meta property="og:description" content="实时监控日志文件tail -f ***.log 查看文件前10行head -n 10 *** 查看文件行数wc -l *** 查看当前目录路径pwd">
+<meta property="og:description" content="实时监控日志文件tail -f ***.log 查看文件前10行head -n 10 *** 解压文件tar -zxvf *** 查看文件行数wc -l *** 查看当前目录路径pwd">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2020-01-08T10:55:03.000Z">
-<meta property="article:modified_time" content="2020-05-07T11:33:49.290Z">
+<meta property="article:modified_time" content="2020-05-14T07:12:23.889Z">
 <meta property="article:author" content="Never say die">
 <meta name="twitter:card" content="summary">
   
@@ -164,16 +164,19 @@
       
         <h6 id="实时监控日志文件"><a href="#实时监控日志文件" class="headerlink" title="实时监控日志文件"></a>实时监控日志文件</h6><p>tail -f ***.log</p>
 <h6 id="查看文件前10行"><a href="#查看文件前10行" class="headerlink" title="查看文件前10行"></a>查看文件前10行</h6><p>head -n 10 ***</p>
+<h6 id="解压文件"><a href="#解压文件" class="headerlink" title="解压文件"></a>解压文件</h6><p>tar -zxvf ***</p>
 <h6 id="查看文件行数"><a href="#查看文件行数" class="headerlink" title="查看文件行数"></a>查看文件行数</h6><p>wc -l ***</p>
 <h6 id="查看当前目录路径"><a href="#查看当前目录路径" class="headerlink" title="查看当前目录路径"></a>查看当前目录路径</h6><p>pwd</p>
  <a id="more"></a> 
 
 <h6 id="查看磁盘使用情况"><a href="#查看磁盘使用情况" class="headerlink" title="查看磁盘使用情况"></a>查看磁盘使用情况</h6><p>df -h</p>
 <h6 id="创建文件夹"><a href="#创建文件夹" class="headerlink" title="创建文件夹"></a>创建文件夹</h6><p>mkdir ***</p>
+<h6 id="创建文件"><a href="#创建文件" class="headerlink" title="创建文件"></a>创建文件</h6><p>touch ***</p>
 <h6 id="将程序jobs-py后台运行，并将输出信息输入到jobs-log中"><a href="#将程序jobs-py后台运行，并将输出信息输入到jobs-log中" class="headerlink" title="将程序jobs.py后台运行，并将输出信息输入到jobs.log中"></a>将程序jobs.py后台运行，并将输出信息输入到jobs.log中</h6><p>nohup python -u jobs.py &gt; jobs.log 2&gt;&amp;1 &amp;</p>
 <p><strong>解析</strong>：nohup(no hang up)-不挂断，一般形式为nohup command &amp;, &amp;表示后台运行，在不指定日志输出文件的情况下默认输出到当前目录下的nohup.out文件中，需要重新指定输出文件是使用 &gt; 指定文件所在路径。 2&gt;&amp;1中2表示 stderr (standard error) 标准错误信息，1表示stdout (standard output) 标准输出，即将错误信息输出到标准信息中，标准信息又是输出到指定的文件中，即将错误信息和标准信息输出到指定的文件中。</p>
 <h6 id="打通道命令"><a href="#打通道命令" class="headerlink" title="打通道命令"></a>打通道命令</h6><p>ssh -f -N -L 1234:202.107.204.49:22 <a href="mailto:root@202.107.204.57">root@202.107.204.57</a> -p 20002</p>
-<h6 id="查看线程"><a href="#查看线程" class="headerlink" title="查看线程"></a>查看线程</h6><p>ps -T</p>
+<h6 id="查看进程"><a href="#查看进程" class="headerlink" title="查看进程"></a>查看进程</h6><p>ps -T</p>
+<p>ps -ef | grep ***: -ef表示全格式显示所有进程。 |是管道命令 是指ps命令与grep同时执行。grep命令是查找。</p>
 <p>查看所有线程 </p>
 <p>top</p>
 <h6 id="关闭线程"><a href="#关闭线程" class="headerlink" title="关闭线程"></a>关闭线程</h6><p>kill [线程 id]</p>
@@ -288,7 +291,7 @@
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    <ol class="toc"><li class="toc-item toc-level-6"><a class="toc-link" href="#实时监控日志文件"><span class="toc-number">1.</span> <span class="toc-text">实时监控日志文件</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#查看文件前10行"><span class="toc-number">2.</span> <span class="toc-text">查看文件前10行</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#查看文件行数"><span class="toc-number">3.</span> <span class="toc-text">查看文件行数</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#查看当前目录路径"><span class="toc-number">4.</span> <span class="toc-text">查看当前目录路径</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#查看磁盘使用情况"><span class="toc-number">5.</span> <span class="toc-text">查看磁盘使用情况</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#创建文件夹"><span class="toc-number">6.</span> <span class="toc-text">创建文件夹</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#将程序jobs-py后台运行，并将输出信息输入到jobs-log中"><span class="toc-number">7.</span> <span class="toc-text">将程序jobs.py后台运行，并将输出信息输入到jobs.log中</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#打通道命令"><span class="toc-number">8.</span> <span class="toc-text">打通道命令</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#查看线程"><span class="toc-number">9.</span> <span class="toc-text">查看线程</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#关闭线程"><span class="toc-number">10.</span> <span class="toc-text">关闭线程</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#查看内存"><span class="toc-number">11.</span> <span class="toc-text">查看内存</span></a></li></ol>
+                    <ol class="toc"><li class="toc-item toc-level-6"><a class="toc-link" href="#实时监控日志文件"><span class="toc-number">1.</span> <span class="toc-text">实时监控日志文件</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#查看文件前10行"><span class="toc-number">2.</span> <span class="toc-text">查看文件前10行</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#解压文件"><span class="toc-number">3.</span> <span class="toc-text">解压文件</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#查看文件行数"><span class="toc-number">4.</span> <span class="toc-text">查看文件行数</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#查看当前目录路径"><span class="toc-number">5.</span> <span class="toc-text">查看当前目录路径</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#查看磁盘使用情况"><span class="toc-number">6.</span> <span class="toc-text">查看磁盘使用情况</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#创建文件夹"><span class="toc-number">7.</span> <span class="toc-text">创建文件夹</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#创建文件"><span class="toc-number">8.</span> <span class="toc-text">创建文件</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#将程序jobs-py后台运行，并将输出信息输入到jobs-log中"><span class="toc-number">9.</span> <span class="toc-text">将程序jobs.py后台运行，并将输出信息输入到jobs.log中</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#打通道命令"><span class="toc-number">10.</span> <span class="toc-text">打通道命令</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#查看进程"><span class="toc-number">11.</span> <span class="toc-text">查看进程</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#关闭线程"><span class="toc-number">12.</span> <span class="toc-text">关闭线程</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#查看内存"><span class="toc-number">13.</span> <span class="toc-text">查看内存</span></a></li></ol>
                     </div>
                 </span>
             </div>

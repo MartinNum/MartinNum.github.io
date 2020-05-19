@@ -8,15 +8,15 @@
   <link rel="dns-prefetch" href="http://yoursite.com">
   <title>InnoDB之事务隔离级别 | Martin&#39;s blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="前言在和同学讨论幻读问题的时候，他们都认为在REPEATABLE READ隔离级别下可能会产生幻读问题，于是在网上查询相关资料也说会产生幻读问题。在这篇文章中我会介绍四种事务隔离级别，并通过结合书中的内容阐述自己对于幻读问题的理解以及自己对于REPEATABLE READ隔离级别下是否会产生幻读问题的理解。（MySQL官方文档中将不可重复读定义为幻读&lt;Phantom Problem&gt;）">
+  <meta name="description" content="前言在和同学讨论幻读问题的时候，他们都认为在REPEATABLE READ隔离级别下可能会产生幻读问题，于是在网上查询相关资料也说可能会产生幻读问题。在这篇文章中我会介绍四种事务隔离级别，并通过结合书中的内容阐述自己对于幻读问题的理解以及自己对于REPEATABLE READ隔离级别下是否会产生幻读问题的理解。（MySQL官方文档中将不可重复读定义为幻读&lt;Phantom Problem&amp;gt">
 <meta property="og:type" content="article">
 <meta property="og:title" content="InnoDB之事务隔离级别">
 <meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2020&#x2F;05&#x2F;09&#x2F;InnoDB%E4%B9%8B%E4%BA%8B%E5%8A%A1%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB&#x2F;index.html">
 <meta property="og:site_name" content="Martin&#39;s blog">
-<meta property="og:description" content="前言在和同学讨论幻读问题的时候，他们都认为在REPEATABLE READ隔离级别下可能会产生幻读问题，于是在网上查询相关资料也说会产生幻读问题。在这篇文章中我会介绍四种事务隔离级别，并通过结合书中的内容阐述自己对于幻读问题的理解以及自己对于REPEATABLE READ隔离级别下是否会产生幻读问题的理解。（MySQL官方文档中将不可重复读定义为幻读&lt;Phantom Problem&gt;）">
+<meta property="og:description" content="前言在和同学讨论幻读问题的时候，他们都认为在REPEATABLE READ隔离级别下可能会产生幻读问题，于是在网上查询相关资料也说可能会产生幻读问题。在这篇文章中我会介绍四种事务隔离级别，并通过结合书中的内容阐述自己对于幻读问题的理解以及自己对于REPEATABLE READ隔离级别下是否会产生幻读问题的理解。（MySQL官方文档中将不可重复读定义为幻读&lt;Phantom Problem&amp;gt">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2020-05-09T15:06:34.000Z">
-<meta property="article:modified_time" content="2020-05-09T15:52:31.342Z">
+<meta property="article:modified_time" content="2020-05-13T14:34:28.376Z">
 <meta property="article:author" content="Never say die">
 <meta name="twitter:card" content="summary">
   
@@ -162,10 +162,10 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在和同学讨论幻读问题的时候，他们都认为在REPEATABLE READ隔离级别下可能会产生幻读问题，于是在网上查询相关资料也说会产生幻读问题。在这篇文章中我会介绍四种事务隔离级别，并通过结合书中的内容阐述自己对于幻读问题的理解以及自己对于REPEATABLE READ隔离级别下是否会产生幻读问题的理解。（MySQL官方文档中将不可重复读定义为幻读&lt;Phantom Problem&gt;）</p>
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在和同学讨论幻读问题的时候，他们都认为在REPEATABLE READ隔离级别下可能会产生幻读问题，于是在网上查询相关资料也说可能会产生幻读问题。在这篇文章中我会介绍四种事务隔离级别，并通过结合书中的内容阐述自己对于幻读问题的理解以及自己对于REPEATABLE READ隔离级别下是否会产生幻读问题的理解。（MySQL官方文档中将不可重复读定义为幻读&lt;Phantom Problem&gt;）</p>
 <a id="more"></a>
 
-<h3 id="事务的特点（ACID）"><a href="#事务的特点（ACID）" class="headerlink" title="事务的特点（ACID）"></a>事务的特点（ACID）</h3><ul>
+<h2 id="基础"><a href="#基础" class="headerlink" title="基础"></a>基础</h2><h3 id="事务的特点（ACID）"><a href="#事务的特点（ACID）" class="headerlink" title="事务的特点（ACID）"></a>事务的特点（ACID）</h3><ul>
 <li>原子性（atomicity）</li>
 <li>一致性（consistency）</li>
 <li>隔离性（isolation）</li>
@@ -177,6 +177,138 @@
 <li>Gap Lock: 间隙锁，锁定一个范围，但不包括记录本身。</li>
 <li>Next-Key Lock: Gap Lock + Record Lock,锁定一个范围，并且锁住记录本身。</li>
 </ul>
+<h6 id="Next-Key-Lock-如果索引有10，11，13，20四个值，可能被Next-Key-Locking锁定的区间为："><a href="#Next-Key-Lock-如果索引有10，11，13，20四个值，可能被Next-Key-Locking锁定的区间为：" class="headerlink" title="Next-Key Lock: 如果索引有10，11，13，20四个值，可能被Next-Key Locking锁定的区间为："></a>Next-Key Lock: 如果索引有10，11，13，20四个值，可能被Next-Key Locking锁定的区间为：</h6><p>$$<br>(-\infty, 10],(10, 11], (11, 13], (13,\infty]<br>$$</p>
+<h6 id="Next-Key-Lock优化：当查询的索引是唯一索引的情况下，InnoDB存储引擎会对Next-Key-Lock进行优化，将其降级为Record-Lock-即仅锁住索引本身。而不是范围。我们来看下面的例子。"><a href="#Next-Key-Lock优化：当查询的索引是唯一索引的情况下，InnoDB存储引擎会对Next-Key-Lock进行优化，将其降级为Record-Lock-即仅锁住索引本身。而不是范围。我们来看下面的例子。" class="headerlink" title="Next-Key Lock优化：当查询的索引是唯一索引的情况下，InnoDB存储引擎会对Next-Key Lock进行优化，将其降级为Record Lock, 即仅锁住索引本身。而不是范围。我们来看下面的例子。"></a>Next-Key Lock优化：当查询的索引是唯一索引的情况下，InnoDB存储引擎会对Next-Key Lock进行优化，将其降级为Record Lock, 即仅锁住索引本身。而不是范围。我们来看下面的例子。</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE z ( a INT, b INT, PRIMARY KEY(a), KEY(b) );</span><br><span class="line">INSERT INTO z SELECT 1,1;</span><br><span class="line">INSERT INTO z SELECT 3,1;</span><br><span class="line">INSERT INTO z SELECT 5,1;</span><br><span class="line">INSERT INTO z SELECT 7,1;</span><br><span class="line">INSERT INTO z SELECT 10,1;</span><br></pre></td></tr></table></figure>
+
+<p>表z中a列为聚集索引，b列为辅组索引，且当前的事务隔离级别为InnoDB默认的REPEATABLE READ。若在会话A中执行如下sql语句。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT * FROM z WHERE b&#x3D;3 FOR UPDATE</span><br></pre></td></tr></table></figure>
+
+<p>FOR UPDATE用于显式地对数据库读取操作加上互斥锁。由于通过b列进行查找，并且存在两个索引，查找过程需要分别进行加锁。对于聚集索引，仅对列a中等于5的索引加上了Record Lock。而对于辅助索引，使用了Next-Key Lock锁定了范围（1,3]，需要要特别注意的是，InnoDB存储引擎还会对辅助索引下一个键值加上Gao Lock, 即锁定范围（3, 6)。因此当此时会话B中运行如下sql语句时，都会被阻塞：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SELECT * FROM z WHERE a&#x3D;5 LOCK IN SHARE MODE</span><br><span class="line">INSERT INTO z SELECT 4,2  &#x2F;&#x2F;辅助索引的（1,3]被锁定，因此b列中插入2的操作被阻塞</span><br><span class="line">INSERT INTO z SELECT 6,5  &#x2F;&#x2F;辅助索引的（3,6]被锁定，因此b列中插入5的操作被阻塞</span><br></pre></td></tr></table></figure>
+
+<h3 id="事务隔离级别与锁算法"><a href="#事务隔离级别与锁算法" class="headerlink" title="事务隔离级别与锁算法"></a>事务隔离级别与锁算法</h3><ul>
+<li><p>READ UNCOMMITTED——可以读到其他事务未提交的修改 </p>
+</li>
+<li><p>READ COMMITTED——除了唯一性约束检查以及外键约束检查需要gap lock外，InnoDB只会使用Record Lock</p>
+</li>
+<li><p>REPEATABLE READ——使用Next-Key Lock</p>
+</li>
+<li><p>SERIALIZABLE——对每个SELECT语句后自动加上LOCK IN SHARE MODE，对一致性的非锁定读不在支持</p>
+</li>
+</ul>
+<h3 id="一致性非锁定读（Multi-Version-Concurrency-Control-MVCC）"><a href="#一致性非锁定读（Multi-Version-Concurrency-Control-MVCC）" class="headerlink" title="一致性非锁定读（Multi Version Concurrency Control, MVCC）"></a>一致性非锁定读（Multi Version Concurrency Control, MVCC）</h3><p>为了提升并发性能，InnoDB存储引擎在不显示加锁的情况下的读取操作都是不加锁的。即如果读取的行正在执行DELETE或UPDATE操作（即该行上被加上了X锁），这时读取操作不会去等待行上锁的释放，而是去读取行的一个快照信息，即该行上之前版本的数据，该实现是通过undo段来实现的。对于不同的事务隔离级别，读取方式也不同，需要注意的是并不是每个事务隔离级别下都支持一致性非锁定读。</p>
+<ul>
+<li>READ COMMITTED——总是读取最新的快照信息。读取最新的版本，会产生幻读。</li>
+<li>REPEATABLE READ——读取事务开始时的快照信息，<strong>由于总是读取事务开始时的快照版本，因此不会产生幻读。</strong></li>
+</ul>
+<p>加入parent表中有一行id=1的数据。</p>
+<table>
+<thead>
+<tr>
+<th>时间</th>
+<th>会话A</th>
+<th>会话B</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>BEGIN</td>
+<td></td>
+</tr>
+<tr>
+<td>2</td>
+<td></td>
+<td>BEGIN</td>
+</tr>
+<tr>
+<td>3</td>
+<td></td>
+<td>UPDATE parent SET id=3 WHERE id=1;</td>
+</tr>
+<tr>
+<td>4</td>
+<td>SELECT*FROM parnt WHERE id=1;</td>
+<td></td>
+</tr>
+<tr>
+<td>5</td>
+<td></td>
+<td>COMMIT;</td>
+</tr>
+<tr>
+<td>6</td>
+<td>SELECT*FROM parnt WHERE id=1;</td>
+<td></td>
+</tr>
+<tr>
+<td>7</td>
+<td>COMMIT</td>
+<td></td>
+</tr>
+<tr>
+<td>8</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h6 id="情况1：当前的事务级别为READ-COMMITTED，由于会话B的更新操作对id-1的行加上了X锁，所以会话A在时间点4无法访问id-1这一行的数据，所以只能从最新的快照信息中读取就版本的数据，即读到的是id-1；在时间点6时，由于会话B的事务已提交，因此更新的最新的快照信息，因此当会话A在时间点6访问最新的快照信息时已经没有id-1的数据了，所以返回Empty。（出现了幻读问题）"><a href="#情况1：当前的事务级别为READ-COMMITTED，由于会话B的更新操作对id-1的行加上了X锁，所以会话A在时间点4无法访问id-1这一行的数据，所以只能从最新的快照信息中读取就版本的数据，即读到的是id-1；在时间点6时，由于会话B的事务已提交，因此更新的最新的快照信息，因此当会话A在时间点6访问最新的快照信息时已经没有id-1的数据了，所以返回Empty。（出现了幻读问题）" class="headerlink" title="情况1：当前的事务级别为READ COMMITTED，由于会话B的更新操作对id=1的行加上了X锁，所以会话A在时间点4无法访问id=1这一行的数据，所以只能从最新的快照信息中读取就版本的数据，即读到的是id=1；在时间点6时，由于会话B的事务已提交，因此更新的最新的快照信息，因此当会话A在时间点6访问最新的快照信息时已经没有id=1的数据了，所以返回Empty。（出现了幻读问题）"></a>情况1：当前的事务级别为READ COMMITTED，由于会话B的更新操作对id=1的行加上了X锁，所以会话A在时间点4无法访问id=1这一行的数据，所以只能从最新的快照信息中读取就版本的数据，即读到的是id=1；在时间点6时，由于会话B的事务已提交，因此更新的最新的快照信息，因此当会话A在时间点6访问最新的快照信息时已经没有id=1的数据了，所以返回Empty。（<strong>出现了幻读问题</strong>）</h6><h6 id="情况2：当前的事务级别为REPEATABLE-READ，由于该事务隔离级别下总是访问事务开始时的快照版本，即时间点1的快照信息版本，所以无论会话B做出怎样的修改，会话A中的事务总是读取时间点1时（事务开始时）的快照信息，即id-1。（不会出现幻读问题）"><a href="#情况2：当前的事务级别为REPEATABLE-READ，由于该事务隔离级别下总是访问事务开始时的快照版本，即时间点1的快照信息版本，所以无论会话B做出怎样的修改，会话A中的事务总是读取时间点1时（事务开始时）的快照信息，即id-1。（不会出现幻读问题）" class="headerlink" title="情况2：当前的事务级别为REPEATABLE READ，由于该事务隔离级别下总是访问事务开始时的快照版本，即时间点1的快照信息版本，所以无论会话B做出怎样的修改，会话A中的事务总是读取时间点1时（事务开始时）的快照信息，即id=1。（不会出现幻读问题）"></a>情况2：当前的事务级别为REPEATABLE READ，由于该事务隔离级别下总是访问事务开始时的快照版本，即时间点1的快照信息版本，所以无论会话B做出怎样的修改，会话A中的事务总是读取时间点1时（事务开始时）的快照信息，即id=1。（<strong>不会出现幻读问题</strong>）</h6><h3 id="一致性锁定读"><a href="#一致性锁定读" class="headerlink" title="一致性锁定读"></a>一致性锁定读</h3><p>显式地为读取操作加锁：</p>
+<ul>
+<li>SELECT…FOR UPDATE——对读取地行加X锁（互斥锁 ）</li>
+<li>SELECT…LOCK IN SHARE MODE——对读取地行加S锁（共享锁）</li>
+</ul>
+<p>需要注意的点：X锁和X锁以及X锁和S锁是不兼容的，只有S锁和S锁是兼容的。</p>
+<h3 id="什么是幻读"><a href="#什么是幻读" class="headerlink" title="什么是幻读"></a>什么是幻读</h3><p>在同一个事务下，连续执行两次同样的SQL语句可能导致不同的结果，即第二次的SQL语句可能会返回之前不存在的行。</p>
+<h6 id="什么操作会产生幻读问题（个人见解）"><a href="#什么操作会产生幻读问题（个人见解）" class="headerlink" title="什么操作会产生幻读问题（个人见解）"></a>什么操作会产生幻读问题（个人见解）</h6><ul>
+<li>不加锁读：INSERT, UPDATE, DELETE</li>
+<li>加锁读：INSERT</li>
+</ul>
+<h3 id="如何解决幻读问题"><a href="#如何解决幻读问题" class="headerlink" title="如何解决幻读问题"></a>如何解决幻读问题</h3><p>innoDB存储引擎通过Next-Key Lock来解决幻读问题。加入表t中有a=2和a=5的行记录。</p>
+<table>
+<thead>
+<tr>
+<th>时间</th>
+<th>会话A</th>
+<th>会话B</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>BEGIN</td>
+<td></td>
+</tr>
+<tr>
+<td>2</td>
+<td>SELECT * FROM t WHERE a&gt;2 FOR UPDATE</td>
+<td></td>
+</tr>
+<tr>
+<td>3</td>
+<td></td>
+<td>BEGIN</td>
+</tr>
+<tr>
+<td>4</td>
+<td></td>
+<td>INSERT INTO t SELECT 4;</td>
+</tr>
+<tr>
+<td>5</td>
+<td></td>
+<td>COMMIT</td>
+</tr>
+<tr>
+<td>6</td>
+<td>SELECT * FROM t WHERE a&gt;2 FOR UPDATE</td>
+<td></td>
+</tr>
+<tr>
+<td>7</td>
+<td>COMMIT</td>
+<td></td>
+</tr>
+</tbody></table>
+<h6 id="情况1：当前的事务级别为READ-COMMITTED，即使用的Record-Lock，会话A中事务会将a-5这一行上X锁，并返回a-2的行记录，但这并不影响会话B中的事务插入a-4的行记录的操作，所以会话A在时间点6执行同样的读取操作时返回的是a-2和a-4的行记录。（出现了幻读问题）"><a href="#情况1：当前的事务级别为READ-COMMITTED，即使用的Record-Lock，会话A中事务会将a-5这一行上X锁，并返回a-2的行记录，但这并不影响会话B中的事务插入a-4的行记录的操作，所以会话A在时间点6执行同样的读取操作时返回的是a-2和a-4的行记录。（出现了幻读问题）" class="headerlink" title="情况1：当前的事务级别为READ COMMITTED，即使用的Record Lock，会话A中事务会将a=5这一行上X锁，并返回a=2的行记录，但这并不影响会话B中的事务插入a=4的行记录的操作，所以会话A在时间点6执行同样的读取操作时返回的是a=2和a=4的行记录。（出现了幻读问题）"></a>情况1：当前的事务级别为READ COMMITTED，即使用的Record Lock，会话A中事务会将a=5这一行上X锁，并返回a=2的行记录，但这并不影响会话B中的事务插入a=4的行记录的操作，所以会话A在时间点6执行同样的读取操作时返回的是a=2和a=4的行记录。（出现了幻读问题）</h6><h6 id="情况2：当前的事务级别为REPEATABLE-READ，会话A会使用Next-Key-Lock对"><a href="#情况2：当前的事务级别为REPEATABLE-READ，会话A会使用Next-Key-Lock对" class="headerlink" title="情况2：当前的事务级别为REPEATABLE READ，会话A会使用Next-Key Lock对"></a>情况2：当前的事务级别为REPEATABLE READ，会话A会使用Next-Key Lock对</h6><p>$$<br>（2，+\infty）<br>$$</p>
+<h6 id="这个范围加上了X锁，因此会话B在时间点4对于这个范围的任何操作都会阻塞。（不会出现幻读-问题）"><a href="#这个范围加上了X锁，因此会话B在时间点4对于这个范围的任何操作都会阻塞。（不会出现幻读-问题）" class="headerlink" title="这个范围加上了X锁，因此会话B在时间点4对于这个范围的任何操作都会阻塞。（不会出现幻读 问题）"></a>这个范围加上了X锁，因此会话B在时间点4对于这个范围的任何操作都会阻塞。（不会出现幻读 问题）</h6><h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>隔离级别REPEATABLE READ在加锁读和不加锁读都不会出现幻读现象。</p>
 
       
 
@@ -249,9 +381,18 @@
   
 <nav id="article-nav">
   
+    <a href="/2020/05/12/ThreadLocal%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          ThreadLocal源码分析
+        
+      </div>
+    </a>
   
-    <a href="/2020/05/08/ThreadLocal%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">ThreadLocal原理解析</div>
+  
+    <a href="/2020/05/07/Leetcode/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Leetcode</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -278,7 +419,7 @@
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#事务的特点（ACID）"><span class="toc-number">1.1.</span> <span class="toc-text">事务的特点（ACID）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#行锁的三种实现"><span class="toc-number">1.2.</span> <span class="toc-text">行锁的三种实现</span></a></li></ol></li></ol>
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#基础"><span class="toc-number">2.</span> <span class="toc-text">基础</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#事务的特点（ACID）"><span class="toc-number">2.1.</span> <span class="toc-text">事务的特点（ACID）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#行锁的三种实现"><span class="toc-number">2.2.</span> <span class="toc-text">行锁的三种实现</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#Next-Key-Lock-如果索引有10，11，13，20四个值，可能被Next-Key-Locking锁定的区间为："><span class="toc-number">2.2.0.0.1.</span> <span class="toc-text">Next-Key Lock: 如果索引有10，11，13，20四个值，可能被Next-Key Locking锁定的区间为：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#Next-Key-Lock优化：当查询的索引是唯一索引的情况下，InnoDB存储引擎会对Next-Key-Lock进行优化，将其降级为Record-Lock-即仅锁住索引本身。而不是范围。我们来看下面的例子。"><span class="toc-number">2.2.0.0.2.</span> <span class="toc-text">Next-Key Lock优化：当查询的索引是唯一索引的情况下，InnoDB存储引擎会对Next-Key Lock进行优化，将其降级为Record Lock, 即仅锁住索引本身。而不是范围。我们来看下面的例子。</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#事务隔离级别与锁算法"><span class="toc-number">2.3.</span> <span class="toc-text">事务隔离级别与锁算法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#一致性非锁定读（Multi-Version-Concurrency-Control-MVCC）"><span class="toc-number">2.4.</span> <span class="toc-text">一致性非锁定读（Multi Version Concurrency Control, MVCC）</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#情况1：当前的事务级别为READ-COMMITTED，由于会话B的更新操作对id-1的行加上了X锁，所以会话A在时间点4无法访问id-1这一行的数据，所以只能从最新的快照信息中读取就版本的数据，即读到的是id-1；在时间点6时，由于会话B的事务已提交，因此更新的最新的快照信息，因此当会话A在时间点6访问最新的快照信息时已经没有id-1的数据了，所以返回Empty。（出现了幻读问题）"><span class="toc-number">2.4.0.0.1.</span> <span class="toc-text">情况1：当前的事务级别为READ COMMITTED，由于会话B的更新操作对id&#x3D;1的行加上了X锁，所以会话A在时间点4无法访问id&#x3D;1这一行的数据，所以只能从最新的快照信息中读取就版本的数据，即读到的是id&#x3D;1；在时间点6时，由于会话B的事务已提交，因此更新的最新的快照信息，因此当会话A在时间点6访问最新的快照信息时已经没有id&#x3D;1的数据了，所以返回Empty。（出现了幻读问题）</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#情况2：当前的事务级别为REPEATABLE-READ，由于该事务隔离级别下总是访问事务开始时的快照版本，即时间点1的快照信息版本，所以无论会话B做出怎样的修改，会话A中的事务总是读取时间点1时（事务开始时）的快照信息，即id-1。（不会出现幻读问题）"><span class="toc-number">2.4.0.0.2.</span> <span class="toc-text">情况2：当前的事务级别为REPEATABLE READ，由于该事务隔离级别下总是访问事务开始时的快照版本，即时间点1的快照信息版本，所以无论会话B做出怎样的修改，会话A中的事务总是读取时间点1时（事务开始时）的快照信息，即id&#x3D;1。（不会出现幻读问题）</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#一致性锁定读"><span class="toc-number">2.5.</span> <span class="toc-text">一致性锁定读</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#什么是幻读"><span class="toc-number">2.6.</span> <span class="toc-text">什么是幻读</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#什么操作会产生幻读问题（个人见解）"><span class="toc-number">2.6.0.0.1.</span> <span class="toc-text">什么操作会产生幻读问题（个人见解）</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#如何解决幻读问题"><span class="toc-number">2.7.</span> <span class="toc-text">如何解决幻读问题</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#情况1：当前的事务级别为READ-COMMITTED，即使用的Record-Lock，会话A中事务会将a-5这一行上X锁，并返回a-2的行记录，但这并不影响会话B中的事务插入a-4的行记录的操作，所以会话A在时间点6执行同样的读取操作时返回的是a-2和a-4的行记录。（出现了幻读问题）"><span class="toc-number">2.7.0.0.1.</span> <span class="toc-text">情况1：当前的事务级别为READ COMMITTED，即使用的Record Lock，会话A中事务会将a&#x3D;5这一行上X锁，并返回a&#x3D;2的行记录，但这并不影响会话B中的事务插入a&#x3D;4的行记录的操作，所以会话A在时间点6执行同样的读取操作时返回的是a&#x3D;2和a&#x3D;4的行记录。（出现了幻读问题）</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#情况2：当前的事务级别为REPEATABLE-READ，会话A会使用Next-Key-Lock对"><span class="toc-number">2.7.0.0.2.</span> <span class="toc-text">情况2：当前的事务级别为REPEATABLE READ，会话A会使用Next-Key Lock对</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#这个范围加上了X锁，因此会话B在时间点4对于这个范围的任何操作都会阻塞。（不会出现幻读-问题）"><span class="toc-number">2.7.0.0.3.</span> <span class="toc-text">这个范围加上了X锁，因此会话B在时间点4对于这个范围的任何操作都会阻塞。（不会出现幻读 问题）</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#总结"><span class="toc-number">2.8.</span> <span class="toc-text">总结</span></a></li></ol></li></ol>
                     </div>
                 </span>
             </div>
